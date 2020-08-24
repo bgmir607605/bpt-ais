@@ -5,11 +5,38 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'language' => 'ru',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+    ],
+    'modules' => [
+        'lk' => [
+            'class' => 'app\modules\lk\Module',
+        ],
+        'admin' => [
+            'class' => 'app\modules\admin\Module',
+        ],
+        'applicant-manager' => [
+            'class' => 'app\modules\applicantManager\Module',
+        ],
+        'group-manager' => [
+            'class' => 'app\modules\groupManager\Module',
+        ],
+        'inspector' => [
+            'class' => 'app\modules\inspector\Module',
+        ],
+        'schedule' => [
+            'class' => 'app\modules\schedule\Module',
+        ],
+        'student' => [
+            'class' => 'app\modules\student\Module',
+        ],
+        'teacher' => [
+            'class' => 'app\modules\teacher\Module',
+        ],
     ],
     'components' => [
         'request' => [
