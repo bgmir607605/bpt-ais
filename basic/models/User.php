@@ -2,95 +2,90 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $id
+ * @property string|null $fName
+ * @property string|null $mName
+ * @property string|null $lName
+ * @property string|null $username
+ * @property string|null $password
+ * @property int $admin
+ * @property int $schedule
+ * @property int $inspector
+ * @property int $teacher
+ * @property int $groupManager
+ * @property int $applicantManager
+ * @property int $student
+ */
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'user';
+    }
 
     /**
      * {@inheritdoc}
      */
+    public function rules()
+    {
+        return [
+            [['admin', 'schedule', 'inspector', 'teacher', 'groupManager', 'applicantManager', 'student'], 'integer'],
+            [['fName', 'mName', 'lName', 'username', 'password'], 'string', 'max' => 255],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'fName' => 'F Name',
+            'mName' => 'M Name',
+            'lName' => 'L Name',
+            'username' => 'Username',
+            'password' => 'Password',
+            'admin' => 'Admin',
+            'schedule' => 'Schedule',
+            'inspector' => 'Inspector',
+            'teacher' => 'Teacher',
+            'groupManager' => 'Group Manager',
+            'applicantManager' => 'Applicant Manager',
+            'student' => 'Student',
+        ];
+    }
+
+
+
+    ########################
+    // Реализация интерфейса
+    ########################
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        $user = self::findOne($id);
+        return isset($user) ? new static($user) : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
     public static function findByUsername($username)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        $user = self::find()->where(['username' => $username])->one();
+        return isset($user) ? new static($user) : null;
     }
-
-    /**
-     * {@inheritdoc}
-     */
+ 
     public function getId()
     {
         return $this->id;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
+    
     /**
      * Validates password
      *
@@ -99,6 +94,22 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return Yii::$app->getSecurity()->validatePassword($password, $this->password);
     }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // 
+    }
+
+    public function getAuthKey()
+    {
+        // 
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        // 
+    }
+
 }
