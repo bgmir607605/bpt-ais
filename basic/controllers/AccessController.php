@@ -29,12 +29,37 @@ class AccessController extends Controller
 		return true;
     }
     
-    /**
-     * Renders the index view for the module
-     * @return string
-     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => \yii\filters\VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    public function actionView($id)
+    {
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    // При удалении любой сущности она остаётся и помечается как удалённая
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $model->deleted = 1;
+        $model->save();
+
+        return $this->redirect(['index']);
+    }
+
     public function actionIndex()
     {
-        return $this->goHome();
+        return $this->render('index');
     }
 }
