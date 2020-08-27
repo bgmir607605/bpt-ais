@@ -24,6 +24,7 @@ class m200827_140857_create_schedule_table extends Migration
             'kp' => $this->integer().' NOT NULL DEFAULT 0',
             'sr' => $this->integer().' NOT NULL DEFAULT 0',
             'replaceTeacherId' => $this->integer().' DEFAULT NULL',
+            'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
 
         // creates index for column `specialtyId`

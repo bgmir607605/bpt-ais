@@ -26,6 +26,7 @@ class m200817_071207_create_user_table extends Migration
             'groupManager' => $this->integer().' NOT NULL DEFAULT 0',
             'applicantManager' => $this->integer().' NOT NULL DEFAULT 0',
             'student' => $this->integer().' NOT NULL DEFAULT 1',
+            'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
     }
 

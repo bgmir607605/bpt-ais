@@ -17,6 +17,7 @@ class m200827_134902_create_discipline_table extends Migration
             'shortName' => $this->string(),
             'fullName' => $this->string(),
             'directId' => $this->integer().' DEFAULT NULL',
+            'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
 
         // creates index for column `directId`

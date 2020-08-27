@@ -25,6 +25,7 @@ class m200827_135812_create_teacherload_table extends Migration
             'sSubKP' => $this->integer().' NOT NULL DEFAULT 0',
             'sr' => $this->integer().' NOT NULL DEFAULT 0',
             'exam' => $this->integer().' NOT NULL DEFAULT 0',
+            'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
 
         $this->createIndex(

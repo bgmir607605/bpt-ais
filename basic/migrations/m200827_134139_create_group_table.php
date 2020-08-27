@@ -14,6 +14,7 @@ class m200827_134139_create_group_table extends Migration
             'name' => $this->string(),
             'directId' => $this->integer(),
             'course' => "SET('1', '2', '3', '4') NOT NULL",
+            'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
 
         // creates index for column `directId`

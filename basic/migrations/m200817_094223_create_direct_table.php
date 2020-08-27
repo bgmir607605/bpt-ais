@@ -18,6 +18,7 @@ class m200817_094223_create_direct_table extends Migration
             'name' => $this->string(),
             'type' => " SET('СПО','НПО') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'СПО'",
             'forApplicant' => $this->integer().' DEFAULT 0',
+            'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
     }
 
