@@ -37,7 +37,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['admin', 'schedule', 'inspector', 'teacher', 'groupManager', 'applicantManager', 'student'], 'integer'],
+            [['admin', 'schedule', 'inspector', 'teacher', 'groupManager', 'applicantManager', 'student', 'deleted'], 'integer'],
             [['fName', 'mName', 'lName', 'username', 'password'], 'string', 'max' => 255],
         ];
     }
@@ -61,6 +61,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'groupManager' => 'Group Manager',
             'applicantManager' => 'Applicant Manager',
             'student' => 'Student',
+            'deleted' => 'deleted',
         ];
     }
 
