@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use yii\widgets\Menu;
 
 AppAsset::register($this);
 ?>
@@ -38,9 +39,24 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            // ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Админ', 'url' => ['/admin']],
+            ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']],
+            ['label' => 'Кл.рук', 'url' => ['/group-manager']],
+            ['label' => 'Инспектор', 'url' => ['/inspector']],
+
+            [
+                'label' => 'Расписание', 
+                'items' => [
+                    ['label' => 'Направления', 'url' => ['/schedule/direct']],
+                    ['label' => 'Группы', 'url' => ['/schedule/group']],
+                ]
+            ],
+
+
+            ['label' => 'Студент', 'url' => ['/student']],
+            ['label' => 'Преподаватель', 'url' => ['/teacher']],
+            ['label' => 'ЛК', 'url' => ['/lk']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
