@@ -40,7 +40,12 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             // ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Админ', 'url' => ['/admin']],
+            [
+                'label' => 'Админ', 
+                'items' => [
+                    ['label' => 'Пользователи', 'url' => ['/admin/user']],
+                ]
+            ],
             ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']],
             ['label' => 'Кл.рук', 'url' => ['/group-manager']],
             ['label' => 'Инспектор', 'url' => ['/inspector']],
