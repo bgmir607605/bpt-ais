@@ -59,7 +59,7 @@ AppAsset::register($this);
 
             ['label' => 'Студент', 'url' => ['/student']],
             ['label' => 'Преподаватель', 'url' => ['/teacher']],
-            ['label' => 'ЛК', 'url' => ['/lk']],
+            ['label' => 'ЛК', 'url' => ['/user']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
