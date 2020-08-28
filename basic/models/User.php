@@ -65,6 +65,25 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         ];
     }
 
+    public function getFio()
+    {
+        return $this->lName.' '.$this->fName.' '.$this->mName.' ';
+    }
+
+    public static function teachers()
+    {
+        return self::find()->where(['teacher' => '1'])->andWhere(['deleted' => '0'])->orderBy('lName')->all();
+    }
+
+    public static function teachersForDropdown()
+    {
+        $res = array();
+        foreach(self::teachers() as $teacher){
+            $res[$teacher->id] = $teacher->fio;
+        }
+        return $res;
+    }
+
 
 
     ########################
