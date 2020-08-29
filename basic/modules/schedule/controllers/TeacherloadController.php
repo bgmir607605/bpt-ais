@@ -25,10 +25,17 @@ class TeacherloadController extends DefaultController
     {
         $searchModel = new TeacherloadSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $groups = Group::find()->where(['deleted' => '0'])->all();
+        $groups = ArrayHelper::map($groups, 'id', 'name');
+        $disciplines = Discipline::find()->where(['deleted' => '0'])->all();
+        $disciplines = ArrayHelper::map($disciplines, 'id', 'fullName');
+        Yii::$app->session->setFlash('info', 'Добавление нагрузок осуществляется через страницу "Группы"');
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'teachersList' => User::teachersForDropdown(),
+            'groupsList' => $groups,
+            'disciplinesList' => $disciplines,
         ]);
     }
 
@@ -44,11 +51,11 @@ class TeacherloadController extends DefaultController
         $disciplines = Discipline::find()->where(['deleted' => '0'])
         ->andWhere(['or', ['is', 'directId', new \yii\db\Expression('null')], ['directId' => $group->directId]])
         ->all();
-        $disciplines = ArrayHelper::map($disciplines, 'id', 'shortName');
+        $disciplines = ArrayHelper::map($disciplines, 'id', 'fullName');
 
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['/schedule/teacherload/list-for-group', 'groupId' => $model->groupId]);
         }
 
         return $this->render('create', [
@@ -99,8 +106,6 @@ class TeacherloadController extends DefaultController
     {
         $group = Group::findOne($groupId);
         $searchModel = new TeacherloadSearch();
-        // var_dump(Yii::$app->request->queryParams);
-        // $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider = $searchModel->forGroup($groupId, Yii::$app->request->queryParams);
 
         return $this->render('for-group', [

@@ -14,9 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -24,12 +21,36 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'userId',
-            'groupId',
-            'disciplineId',
+            // 'id',
+            [
+                'attribute' => 'userId',
+                'value' => 'user.fio',
+                'filter' => Html::activeDropDownList(
+                    $searchModel, 'userId', 
+                    $teachersList, 
+                    ['prompt' => '', 'class' => 'form-control form-control-sm']
+                ),
+            ],
+            [
+                'attribute' => 'groupId',
+                'value' => 'group.name',
+                'filter' => Html::activeDropDownList(
+                    $searchModel, 'groupId', 
+                    $groupsList, 
+                    ['prompt' => '', 'class' => 'form-control form-control-sm']
+                ),
+            ],
+            [
+                'attribute' => 'disciplineId',
+                'value' => 'discipline.fullName',
+                'filter' => Html::activeDropDownList(
+                    $searchModel, 'disciplineId', 
+                    $disciplinesList, 
+                    ['prompt' => '', 'class' => 'form-control form-control-sm']
+                ),
+            ],
+            
             // 'total',
             //'fSub',
             //'sSub',
