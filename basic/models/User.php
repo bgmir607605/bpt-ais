@@ -84,6 +84,22 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $res;
     }
 
+    public function markAsDeleted()
+    {
+        $this->deleted = '1';
+        $this->save();
+        // Привязанные нагрузки
+        $teacherloads = Teacherload::find()->where(['userId' => $this->id])->all();
+        foreach($teacherloads as $teacherload){
+            $teacherload->markAsDeleted();
+        }
+        // Привязанные занятия
+        $schedules = Schedule::find()->where(['replaceTeacherId' => $this->id])->all();
+        foreach($schedules as $schedule){
+            $schedule->markAsDeleted();
+        }
+    }
+
 
 
     ########################

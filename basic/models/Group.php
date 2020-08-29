@@ -61,4 +61,15 @@ class Group extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Direct::className(), ['id' => 'directId']);
     }
+
+    public function markAsDeleted()
+    {
+        $this->deleted = '1';
+        $this->save();
+        // Привязанные нагрузки
+        $teacherloads = Teacherload::find()->where(['groupId' => $this->id])->all();
+        foreach($teacherloads as $teacherload){
+            $teacherload->markAsDeleted();
+        }
+    }
 }

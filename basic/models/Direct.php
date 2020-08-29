@@ -49,4 +49,19 @@ class Direct extends \yii\db\ActiveRecord
             'deleted' => 'deleted',
         ];
     }
+    public function markAsDeleted()
+    {
+        $this->deleted = '1';
+        $this->save();
+        // Привязанные группы
+        $groups = Group::find()->where(['directId' => $this->id])->all();
+        foreach($groups as $group){
+            $group->markAsDeleted();
+        }
+        // Привязанные дисциплины
+        $disciplines = Discipline::find()->where(['directId' => $this->id])->all();
+        foreach($disciplines as $discipline){
+            $discipline->markAsDeleted();
+        }
+    }
 }

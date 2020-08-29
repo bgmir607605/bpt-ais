@@ -86,4 +86,10 @@ class Schedule extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Teacherload::className(), ['id' => 'teacherLoadId']);
     }
+
+    public function markAsDeleted()
+    {
+        $this->deleted = '1';
+        $this->save();
+    }
 }
