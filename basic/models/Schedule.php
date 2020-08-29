@@ -40,7 +40,6 @@ class Schedule extends \yii\db\ActiveRecord
         return [
             [['date'], 'safe'],
             [['number', 'teacherLoadId', 'cons', 'forTeach', 'hours', 'kp', 'sr', 'replaceTeacherId', 'deleted'], 'integer'],
-            [['type'], 'required'],
             [['type'], 'string'],
             [['replaceTeacherId'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['replaceTeacherId' => 'id']],
             [['teacherLoadId'], 'exist', 'skipOnError' => true, 'targetClass' => Teacherload::className(), 'targetAttribute' => ['teacherLoadId' => 'id']],
