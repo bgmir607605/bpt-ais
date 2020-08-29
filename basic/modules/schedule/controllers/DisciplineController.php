@@ -50,7 +50,8 @@ class DisciplineController extends DefaultController
         $model = new Discipline();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', $model->fullName);
+            return $this->redirect(['index']);
         }
 
         return $this->redirect(['index']);
