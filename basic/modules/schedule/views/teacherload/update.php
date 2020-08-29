@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Teacherload */
 
-$this->title = 'Update Teacherload: ' . $model->id;
+$this->title = 'Редактирование : ' . $model->group->name.' '.$model->user->lName.' '.$model->discipline->fullName;
 $this->params['breadcrumbs'][] = ['label' => 'Teacherloads', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
@@ -16,6 +16,9 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'teachers' => $teachers,
+        'group' => $model->group,
+        'disciplines' => $disciplines,
     ]) ?>
 
 </div>

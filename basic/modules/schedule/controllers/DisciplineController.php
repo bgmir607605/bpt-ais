@@ -25,7 +25,7 @@ class DisciplineController extends DefaultController
         $searchModel = new DisciplineSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $directsList = Direct::find()->orderBy('name')->all();
+        $directsList = Direct::find()->where(['deleted' => '0'])->orderBy('name')->all();
         array_unshift($directsList, ['id' => '', 'name' =>'Показать всё']);
         array_unshift($directsList, ['id' => '-1', 'name' =>'Только общие']);
 
@@ -50,7 +50,8 @@ class DisciplineController extends DefaultController
         $model = new Discipline();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', $model->fullName);
+            return $this->redirect(['index']);
         }
 
         return $this->redirect(['index']);
@@ -94,7 +95,7 @@ class DisciplineController extends DefaultController
     }
 
     protected function getDirectsList(){
-        $directs = Direct::find()->orderBy('code')->all();
+        $directs = Direct::find()->where(['deleted' => '0'])->orderBy('code')->all();
         $directsList = array();
         $directsList[''] = 'Общ';
         foreach($directs as $direct){

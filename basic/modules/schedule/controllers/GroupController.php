@@ -41,7 +41,7 @@ class GroupController extends DefaultController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
+        // TODO Убрать дублирование
         $directs = Direct::find()->where(['deleted' => '0'])->all();
         $directsList = array();
         foreach($directs as $direct){

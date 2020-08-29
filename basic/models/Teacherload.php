@@ -98,4 +98,16 @@ class Teacherload extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'userId']);
     }
+
+    public function markAsDeleted()
+    {
+        $this->deleted = '1';
+        $this->save();
+
+        // Каскадно помечаем удалёнными все привязанные занятия
+        $schedules = Schedule::find()->where(['teacherloadId' => $this->id])->all();
+        foreach($schedules as $schedule){
+            $schedule->markAsDeleted();
+        }
+    }
 }

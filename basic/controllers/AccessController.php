@@ -52,8 +52,7 @@ class AccessController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $model->deleted = 1;
-        $model->save();
+        $model->markAsDeleted();
 
         return $this->redirect(['index']);
     }

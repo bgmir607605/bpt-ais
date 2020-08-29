@@ -71,4 +71,15 @@ class Discipline extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Teacherload::className(), ['disciplineId' => 'id']);
     }
+
+    public function markAsDeleted()
+    {
+        $this->deleted = '1';
+        $this->save();
+        // Привязанные нагрузки
+        $teacherloads = Teacherload::find()->where(['disciplineId' => $this->id])->all();
+        foreach($teacherloads as $teacherload){
+            $teacherload->markAsDeleted();
+        }
+    }
 }
