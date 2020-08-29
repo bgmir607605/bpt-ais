@@ -4,6 +4,8 @@ namespace app\modules\schedule\controllers;
 
 use Yii;
 use app\models\Schedule;
+use app\models\User;
+use app\models\Teacherload;
 use app\models\TLS;
 use yii\web\NotFoundHttpException;
 
@@ -59,7 +61,6 @@ class ScheduleController extends DefaultController
 
 
 ##################
-    // TODO проверить эту функцию
     public function actionSave()
     {
         // $log = new Log();
@@ -200,6 +201,62 @@ class ScheduleController extends DefaultController
             }
         }
         return $res;
+    }
+
+    public function actionGetFile($date = NULL)
+    {
+        // TODO рефакторинг
+        // TODO дублирование с API
+        // Если дату не указали в гет - ищем в пост
+        if ($date == NULL) {
+            $date = Yii::$app->request->post('date');
+        }
+        // если не нашли в пост - находим последнюю дату занятия
+        if ($date == NULL) {
+            $date = Yii::$app->db->createCommand("select `date` from schedule order by `date` desc limit 1")
+            ->queryOne()["date"];
+        }
+        $response["date"] = $date;
+        $response["container"] = array();
+        for($course = 1; $course <= 4;$course++){
+            // Временный массив для групп текущего курса
+            $tmpCourse["groups"] = array();
+            $groups = Yii::$app->db->createCommand("select * from `group` where course = '$course'")
+            ->queryAll();
+            foreach($groups as $group){
+                $idGroup = $group["id"];
+                // Описывем название группы и нагрузки
+                $tmpGroup["name"] = $group["name"];
+                $tmpGroup["id"] = $group["id"];
+
+                // Расписание на указанную дату по текущей группе без УЧ
+                $tmpSchedule = array();
+                $loads =  Yii::$app->db->createCommand("SELECT * from schedule where schedule.date = '$date' 
+                and schedule.teacherLoadId in (select id from teacherload where teacherload.groupId = $idGroup) and forTeach = 0 order by schedule.number")
+                ->queryAll();
+                foreach($loads as $schedule){
+                    $teacherLoad = Teacherload::findOne($schedule["teacherLoadId"]);
+                    $tmp["number"] = $schedule["number"];
+                    $tmp["type"] = $schedule["type"];
+                    $tmp["discipline"] = $teacherLoad->discipline->shortName . ' '. $schedule["type"];
+                    $tmp["teacher"] = $teacherLoad->user->lName;
+                    $replacer = User::findOne($schedule["replaceTeacherId"]);
+                    if(!empty($replacer)){
+                        $tmp["teacher"] = $replacer->lName;
+                    }
+
+                    array_push($tmpSchedule, $tmp);
+                }
+                $tmpGroup["schedule"] = $tmpSchedule;
+                // Добавляем группу в курс
+                array_push($tmpCourse["groups"], $tmpGroup);
+            }
+    
+            // Добавляем курс в ответ
+            $tmpCourse["number"] = $course;
+            array_push($response["container"], $tmpCourse);
+        }
+        Yii::$app->toExcel->getFile($response);
     }
 
 }

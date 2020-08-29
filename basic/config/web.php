@@ -78,6 +78,9 @@ $config = [
             ],
         ],
         */
+        'toExcel' => [
+            'class' => 'app\components\toExcel\ToExcel',
+        ],
     ],
     'params' => $params,
 ];

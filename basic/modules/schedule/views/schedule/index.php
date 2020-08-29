@@ -499,7 +499,7 @@ var schedule = new (function Site() {
 
     // TODO
     this.exportTable = function() {
-        var url = "<?= Url::to(['/shedule/get-file', 'date' => '']); ?>" + $("#dateSelect").val();
+        var url = "<?= Url::to(['/schedule/schedule/get-file', 'date' => '']); ?>" + $("#dateSelect").val();
         window.open(url);
     }
 })();
