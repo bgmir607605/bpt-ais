@@ -12,7 +12,7 @@ class m200829_095555_alter_schedule_table extends Migration
      */
     public function safeUp()
     {
-        $this->alterColumn('schedule', 'type', "SET('', 'I', 'II') default ''",);
+        $this->alterColumn('schedule', 'type', "SET('', 'I', 'II') default ''");
     }
 
     /**
@@ -20,7 +20,7 @@ class m200829_095555_alter_schedule_table extends Migration
      */
     public function safeDown()
     {
-        $this->alterColumn('schedule', 'type', "SET('', 'I', 'II') NOT NULL",);
+        $this->alterColumn('schedule', 'type', "SET('', 'I', 'II') NOT NULL");
     }
 
     /*
