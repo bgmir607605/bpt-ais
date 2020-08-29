@@ -13,7 +13,7 @@ class TLS extends Model {
         for($course = 1; $course <= 4;$course++){
             // Временный массив для групп текущего курса
             $tmpCourse["groups"] = array();
-            $groups = Yii::$app->db->createCommand("select * from `group` where course = '$course'")
+            $groups = Yii::$app->db->createCommand("select * from `group` where `deleted` = 0 and course = '$course'")
             ->queryAll();
             foreach($groups as $group){
                 $idGroup = $group["id"];
@@ -23,7 +23,7 @@ class TLS extends Model {
 
 
                 $tmpTeacherLoads = array();
-                $loads =  Yii::$app->db->createCommand("SELECT teacherload.id, discipline.shortName, user.lName FROM `teacherload` join discipline on discipline.id = teacherload.disciplineId join user on user.id = teacherload.userId  where groupId = $idGroup order by discipline.shortName")
+                $loads =  Yii::$app->db->createCommand("SELECT teacherload.id, discipline.shortName, user.lName FROM `teacherload` join discipline on discipline.id = teacherload.disciplineId join user on user.id = teacherload.userId  where groupId = $idGroup and `teacherload`.`deleted` = 0 order by discipline.shortName")
                 ->queryAll();
                 // Нагрузки по группе
                 $tmpTeacherLoads[] = array('id' => '0', 'text' => '----');
@@ -41,10 +41,11 @@ class TLS extends Model {
         }
         return $response;
     }
+
     public function asIdTextArray()
     {
         $response = array();
-        $loads =  Yii::$app->db->createCommand("SELECT teacherload.id, discipline.shortName, user.lName FROM `teacherload` join discipline on discipline.id = teacherload.disciplineId join user on user.id = teacherload.userId")
+        $loads =  Yii::$app->db->createCommand("SELECT teacherload.id, discipline.shortName, user.lName FROM `teacherload` join discipline on discipline.id = teacherload.disciplineId join user on user.id = teacherload.userId where `deleted` = 0")
         ->queryAll();
         foreach($loads as $load){
             $response[$load["id"]] = $load["shortName"].' '.$load["lName"];

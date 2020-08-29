@@ -80,9 +80,15 @@ class TeacherloadController extends DefaultController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
+        $disciplines = Discipline::find()->where(['deleted' => '0'])
+        ->andWhere(['or', ['is', 'directId', new \yii\db\Expression('null')], ['directId' => $model->group->directId]])
+        ->all();
+        $disciplines = ArrayHelper::map($disciplines, 'id', 'fullName');
 
         return $this->render('update', [
             'model' => $model,
+            'teachers' => User::teachersForDropdown(),
+            'disciplines' => $disciplines,
         ]);
     }
 

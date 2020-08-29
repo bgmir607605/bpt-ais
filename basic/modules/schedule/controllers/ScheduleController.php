@@ -98,7 +98,7 @@ class ScheduleController extends DefaultController
                 $idSimilar = $this->findSimilar($item, $availableSchedule);
                 if(!empty($idSimilar)){
                     // Обновить имеющуюся
-                    $scheduleItem = Schedule::findOne($idSimilar);
+                    $scheduleItem = Schedule::find()->where(['id' =>$idSimilar])->andWhere(['deleted' => '0'])->one();
                     $scheduleItem->setAttributes($item);
                     $scheduleItem->save();
                     $processed[] = $item;
@@ -121,8 +121,9 @@ class ScheduleController extends DefaultController
             }
             // Удалить оставшиеся старые записи
             foreach($availableSchedule as $rec){
+                // Всё равно помечать удалённой. Фильтрация на удалённость лишняя
                 $model = Schedule::findOne($rec->id);
-                $model->delete();
+                $model->markAsDeleted();
             }
         }
 
@@ -149,7 +150,7 @@ class ScheduleController extends DefaultController
         for($course = 1; $course <= 4;$course++){
             // Временный массив для групп текущего курса
             $tmpCourse["groups"] = array();
-            $groups = Yii::$app->db->createCommand("select * from `group` where course = '$course'")
+            $groups = Yii::$app->db->createCommand("select * from `group` where `deleted` = 0 and course = '$course'")
             ->queryAll();
             foreach($groups as $group){
                 $idGroup = $group["id"];
@@ -157,7 +158,7 @@ class ScheduleController extends DefaultController
                 $tmpGroup["name"] = $group["name"];
                 $tmpGroup["id"] = $group["id"];
                 // Расписание на указанную дату по текущей группе
-                $tmpGroup["shedule"] =  Yii::$app->db->createCommand("SELECT * from schedule where schedule.date = '$needDate' and schedule.teacherLoadId in (select id from teacherload where teacherload.groupId = $idGroup)")
+                $tmpGroup["shedule"] =  Yii::$app->db->createCommand("SELECT * from schedule where `deleted` = 0 and schedule.date = '$needDate' and schedule.teacherLoadId in (select id from teacherload where `deleted` = 0 and teacherload.groupId = $idGroup)")
                 ->queryAll();
                 // Добавляем группу в курс
                 array_push($tmpCourse["groups"], $tmpGroup);
@@ -213,7 +214,7 @@ class ScheduleController extends DefaultController
         }
         // если не нашли в пост - находим последнюю дату занятия
         if ($date == NULL) {
-            $date = Yii::$app->db->createCommand("select `date` from schedule order by `date` desc limit 1")
+            $date = Yii::$app->db->createCommand("select `date` from schedule where `deleted` = 0 order by `date` desc limit 1")
             ->queryOne()["date"];
         }
         $response["date"] = $date;
@@ -221,7 +222,7 @@ class ScheduleController extends DefaultController
         for($course = 1; $course <= 4;$course++){
             // Временный массив для групп текущего курса
             $tmpCourse["groups"] = array();
-            $groups = Yii::$app->db->createCommand("select * from `group` where course = '$course'")
+            $groups = Yii::$app->db->createCommand("select * from `group` where course = '$course' and `deleted` = 0")
             ->queryAll();
             foreach($groups as $group){
                 $idGroup = $group["id"];
@@ -231,16 +232,18 @@ class ScheduleController extends DefaultController
 
                 // Расписание на указанную дату по текущей группе без УЧ
                 $tmpSchedule = array();
-                $loads =  Yii::$app->db->createCommand("SELECT * from schedule where schedule.date = '$date' 
-                and schedule.teacherLoadId in (select id from teacherload where teacherload.groupId = $idGroup) and forTeach = 0 order by schedule.number")
+                $loads =  Yii::$app->db->createCommand("SELECT * from schedule where `deleted` = 0 and schedule.date = '$date' 
+                and schedule.teacherLoadId in (select id from teacherload where `deleted` = 0 and teacherload.groupId = $idGroup) and forTeach = 0 order by schedule.number")
                 ->queryAll();
                 foreach($loads as $schedule){
-                    $teacherLoad = Teacherload::findOne($schedule["teacherLoadId"]);
+                    $teacherLoad = Teacherload::find()->where(['deleted' => '0'])->andWhere(['id' => $schedule["teacherLoadId"]])->one();
+                    // $teacherLoad = Teacherload::findOne($schedule["teacherLoadId"]);
                     $tmp["number"] = $schedule["number"];
                     $tmp["type"] = $schedule["type"];
                     $tmp["discipline"] = $teacherLoad->discipline->shortName . ' '. $schedule["type"];
                     $tmp["teacher"] = $teacherLoad->user->lName;
-                    $replacer = User::findOne($schedule["replaceTeacherId"]);
+                    $replacer = User::find()->where(['deleted' => '0'])->andWhere(['id' => $schedule["replaceTeacherId"]])->one();
+                    // $replacer = User::findOne($schedule["replaceTeacherId"]);
                     if(!empty($replacer)){
                         $tmp["teacher"] = $replacer->lName;
                     }
