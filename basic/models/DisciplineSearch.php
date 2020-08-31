@@ -46,6 +46,10 @@ class DisciplineSearch extends Discipline
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 100,
+                'pageParam' => 'active',
+            ],
         ]);
 
         $this->load($params);

@@ -29,6 +29,49 @@ AppAsset::register($this);
 
 <div class="wrap">
     <?php
+
+    $items = array();
+    if(Yii::$app->user->isGuest){
+        $itemsMenu[] = ['label' => 'Войти', 'url' => ['/site/login']];
+    } else {
+        if(Yii::$app->user->identity->admin == 1){
+            $itemsMenu[] = [
+                'label' => 'Админ', 
+                'items' => [
+                    ['label' => 'Пользователи', 'url' => ['/admin/user']],
+                ]
+                ];
+        }
+        if(Yii::$app->user->identity->schedule == 1){
+            $itemsMenu[] = [
+                'label' => 'Расписание', 
+                'items' => [
+                    ['label' => 'Направления', 'url' => ['/schedule/direct']],
+                    ['label' => 'Группы', 'url' => ['/schedule/group']],
+                    ['label' => 'Дисциплины', 'url' => ['/schedule/discipline']],
+                    ['label' => 'Нагрузки', 'url' => ['/schedule/teacherload']],
+                    ['label' => 'Расписание', 'url' => ['/schedule/schedule']],
+                ]
+            ];
+        }
+        // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
+        // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
+        // $itemsMenu[] = ['label' => 'Инспектор', 'url' => ['/inspector']];
+        // $itemsMenu[] = ['label' => 'Студент', 'url' => ['/student']];
+        // $itemsMenu[] = ['label' => 'Преподаватель', 'url' => ['/teacher']];
+        $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
+        $itemsMenu[] = (
+            '<li>'
+            . Html::beginForm(['/site/logout'], 'post')
+            . Html::submitButton(
+                'Выход (' . Yii::$app->user->identity->username . ')',
+                ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>'
+            );
+    }
+
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
@@ -38,46 +81,7 @@ AppAsset::register($this);
     ]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            // ['label' => 'Home', 'url' => ['/site/index']],
-            [
-                'label' => 'Админ', 
-                'items' => [
-                    ['label' => 'Пользователи', 'url' => ['/admin/user']],
-                ]
-            ],
-            ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']],
-            ['label' => 'Кл.рук', 'url' => ['/group-manager']],
-            ['label' => 'Инспектор', 'url' => ['/inspector']],
-
-            [
-                'label' => 'Расписание', 
-                'items' => [
-                    ['label' => 'Направления', 'url' => ['/schedule/direct']],
-                    ['label' => 'Группы', 'url' => ['/schedule/group']],
-                    ['label' => 'Дисциплины', 'url' => ['/schedule/discipline']],
-                    ['label' => 'Нагрузки', 'url' => ['/schedule/teacherload']],
-                    ['label' => 'Расписание', 'url' => ['/schedule/schedule']],
-                ]
-            ],
-
-
-            ['label' => 'Студент', 'url' => ['/student']],
-            ['label' => 'Преподаватель', 'url' => ['/teacher']],
-            ['label' => 'ЛК', 'url' => ['/user']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
+        'items' => $itemsMenu,
     ]);
     NavBar::end();
     ?>
