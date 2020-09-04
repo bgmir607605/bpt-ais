@@ -50,7 +50,7 @@ class TeacherloadController extends DefaultController
         $model = new Teacherload();
         $disciplines = Discipline::find()->where(['deleted' => '0'])
         ->andWhere(['or', ['is', 'directId', new \yii\db\Expression('null')], ['directId' => $group->directId]])
-        ->all();
+        ->orderBy('fullName')->all();
         $disciplines = ArrayHelper::map($disciplines, 'id', 'fullName');
 
 
@@ -82,7 +82,7 @@ class TeacherloadController extends DefaultController
         }
         $disciplines = Discipline::find()->where(['deleted' => '0'])
         ->andWhere(['or', ['is', 'directId', new \yii\db\Expression('null')], ['directId' => $model->group->directId]])
-        ->all();
+        ->orderBy('fullName')->all();
         $disciplines = ArrayHelper::map($disciplines, 'id', 'fullName');
 
         return $this->render('update', [
