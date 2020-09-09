@@ -7,7 +7,7 @@
     /* @var $searchModel app\models\SheduleSearch */
     /* @var $dataProvider yii\data\ActiveDataProvider */
 
-    $this->title = 'Shedules';
+    $this->title = 'Schedules';
 ?>
 
 <style>
@@ -115,6 +115,11 @@ var schedule = new (function Site() {
         "2": '#9CFF9C',
     }
 
+    /* 
+     * Create status message
+     * @param String text is message text
+     * @param Number level is message level (see this.L_*)
+     */
     this.setStatus = function(text, level) {
         level = level || 0;
         $("#status").text(text);
@@ -124,6 +129,11 @@ var schedule = new (function Site() {
     }
 
 
+    /*
+     * Get cached teacher loads
+     * @return Array is cached teacher loads
+     * @return NULL means nothing is cached
+     */ 
     this.getCachedTLSInfo = function() {
         var stored = localStorage.getItem(this.TLS_CACHE_KEY);
         if(!stored) return null;
@@ -134,22 +144,38 @@ var schedule = new (function Site() {
         }
     }
 
+    /*
+     * Set new teacher loads cache
+     * @param Array tlsinfo is new teacher loads
+     */
     this.setCachedTLSInfo = function(tlsinfo) {
         localStorage.setItem(this.TLS_CACHE_KEY, JSON.stringify(tlsinfo));
     }
 
+    /*
+     * Get actual teacher loads from server
+     * @return Array is raw result from server
+     */
     this.getActualTLSInfo = function() {
-        this.setStatus('Получаем нагрузки...', 0);
+        this.setStatus('Получаем нагрузки...', this.L_DEFAULT);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '<?= Url::to(["/schedule/schedule/gettls"]) ?>', false);
         xhr.send()
         var d = xhr.responseText;
-        this.setStatus('Нагрузки получены', 2);
+        this.setStatus('Нагрузки получены', this.L_SUCCESS);
         return 'string' == typeof d ? JSON.parse(d) : d;
     }
 
+    /*
+     * Get teacher loads and update it if loads info is obsolete
+     * @param String version is actual version of loads
+     * @return Array is cached or actual loads, depends on situation
+     * 
+     */
     this.getTLSInfo = function(actualVersion) {
         var cachedTls = this.getCachedTLSInfo();
+        // If not cached or actual version is not cached version (or null)
+        // TODO: remove `|| true` when version control become stable
         if(!cachedTls || (actualVersion != cachedTls.versionTLS && actualVersion != null) || true) {
             var actualInfo = this.getActualTLSInfo();
             this.setCachedTLSInfo(actualInfo);
@@ -158,6 +184,9 @@ var schedule = new (function Site() {
         return cachedTls;
     }
 
+    /*
+     * Optimize teacher loads for faster search
+     */
     this.optimizeTeacherLoads = function() {
         var optimized = {}
         var info = this.tlsinfo.courses;
@@ -170,7 +199,13 @@ var schedule = new (function Site() {
         }
         this.tlsinfo.optimized = optimized;
     }
-
+    
+    /*
+     * Set "locked" state of inputs
+     * Actually, it is just disabling date selector and
+     * makes everything grayscale
+     * @param Boolean state of lock
+     */
     this.setLockedState = function(state) {
         $('#scheduleGrid').css({
             'filter': state ? 'grayscale(0.5)' : '',
@@ -179,36 +214,46 @@ var schedule = new (function Site() {
         $("#dateSelect").prop('disabled', state);
     }
 
+    /*
+     * Get new schedule and show it
+     * @param Number weeksAgo - how far from selected date should we pick info
+     * @param Boolean changeSelected - change to new date or not
+     */
     this.getSchedule = function(weeksAgo, changeSelected) {
-        var date = $('#dateSelect').val();
-        if(date === '') {
+        var _date = $('#dateSelect').val();
+        if(_date === '') {
             alert('Сначала нужно ввести дату');
-            this.setStatus("Дата не введена", 1);
+            this.setStatus("Дата не введена", this.L_ERROR);
             return;
         }
         if(weeksAgo == 0) {
-            this.getScheduleForDate(date);
+            this.getScheduleForDate(_date);
         } else {
-            var oDate = new Date(date);
+            var oDate = new Date(_date);
             var delta = (7 * 24 * 3600 * weeksAgo * 1000);
             oDate.setTime(oDate.getTime() - delta);
             var reqDate = oDate.toISOString().split("T")[0];
             this.getScheduleForDate(reqDate);
             if(!changeSelected) {
-                $('#dateSelect').val(date);
+                $('#dateSelect').val(_date);
             }
         }
     }
 
-    this.getScheduleForDate = function(date) {
+    /*
+     * Get schedule for specified date
+     * @param String _date is date in format "YYYY-mm-dd"
+     * 
+     */ 
+    this.getScheduleForDate = function(_date) {
         var self = this;
-        this.setStatus("Получаем расписание за " + date, 0);
-        this.setLockedState(true);
+        this.setStatus("Получаем расписание за " + _date, this.L_DEFAULT);
+        this.setLockedState(true); // Lock input
         $.ajax({
             'type': 'POST',
             'url': '<?= Url::to(["/schedule/schedule/getdata"]) ?>',
             'data': {
-                'needDate': date
+                'needDate': _date
             },
             'dataType': 'json',
             'error': function(xhr) {
@@ -220,23 +265,30 @@ var schedule = new (function Site() {
                 var data = 'string' == typeof d ? JSON.parse(d) : d;
                 self.tlsinfo = self.getTLSInfo();
                 self.elemcache.teachersel = self.makeTeacherSelector();
-                self.optimizeTeacherLoads();
+                self.optimizeTeacherLoads(); // Because we can
                 self.setStatus("Расписание получено", 2);
-                $("#scheduleGrid").html("");
+                $("#scheduleGrid").html(""); // Clean existing schedule
+                // Process every course
                 for (var i = 0; i < data.courses.length; i++) {
                     var courseElem = self.processCourse(data.courses[i]);
                     courseElem.appendTo($('#scheduleGrid'));
                 }
-                self.setLockedState(false);
+                self.setLockedState(false); // Unlock input
             }
         });
     }
 
+    /*
+     * Process one course
+     * @param Array course data
+     * @return DOMElement course element
+     */
     this.processCourse = function(course) {
         var courseElem = $('<div class="course"></div>');
         var header = $('<h3></h3>').attr('data-number', course.number);
         header.text(course.number + ' курс');
         header.appendTo(courseElem);
+
         var table = $('<table></table>');
         for (var i = 0; i < course.groups.length; i += 2) {
             var head_row = $('<tr class="sch-head"></tr>');
@@ -244,9 +296,15 @@ var schedule = new (function Site() {
             var grp1 = course.groups[i];
             var grp2 = course.groups[i + 1];
             var cspan =  grp2 == undefined ? 2 : 1;
+
+            // Ok, here is a tricky one
+            // We're creating table cell, appending into it header with group name
+            // Then we're setting colspan of new cell to correct one
+            // And only then we're appending it into header. Phew.
             head_row.append($('<td></td>').append($('<h4></h4>').text(grp1.name)).attr('colspan', cspan));
             sch_row.append(this.processGroup(grp1).attr('colspan', cspan));
-
+            
+            // If second group is available
             if(grp2 !== undefined) {
                 head_row.append($('<td></td>').append($('<h4></h4>').text(grp2.name)));
                 sch_row.append(this.processGroup(grp2));
@@ -258,6 +316,11 @@ var schedule = new (function Site() {
         return courseElem;
     }
 
+    /*
+     * Process one group
+     * @param Array group data
+     * @return DOMElement group element
+     */
     this.processGroup = function(group) {
         var elem = $('<td class="group"></td>').attr('data-id', group.id);
         for(var i = 1; i <= this.lessonsPerDay; i++) {
@@ -271,6 +334,17 @@ var schedule = new (function Site() {
         return elem;
     }
 
+    /*
+     * Find lesson info by number
+     * @param Number ndx - index of lesson
+     * @param Array lessons is list of lessons
+     * @return Array{
+     *   Number type is type of lesson (1 - first subgroup, 2 - second, 3 - have data for both, 4 - joined)
+     *   Array lessons [
+     *      List of two lessons. One of them may be just empty array
+     *   ]
+     * }
+     */
     this.findLessonsByNumber = function(ndx, lessons) {
         var result = {'type': 0, 'lessons': [{}, {}]};
         for (var i = 0; i < lessons.length; i++) {
@@ -294,6 +368,12 @@ var schedule = new (function Site() {
         return result;
     }
 
+    /*
+     * Make teacher loads selector
+     * @param Array loads is teacher loads data
+     * @param String selected is key of current load
+     * @return DOMElement selector
+     */
     this.makeTeacherLoadsSelector = function(loads, selected) {
         var label = $('<label class="tch-sel"></label>');
         label.attr('title', 'Кто должен преподавать');
@@ -313,6 +393,11 @@ var schedule = new (function Site() {
         return label;
     }
 
+    /*
+     * Make teacher selector
+     * NOTE: here are ALL teachers available
+     * @return DOMElement selector
+     */
     this.makeTeacherSelector = function() {
         var label = $('<label class="tch-sel"></label>');
         label.attr('title', 'Кто заменяет');
@@ -329,6 +414,10 @@ var schedule = new (function Site() {
         return label;
     }
 
+    /*
+     * Make teacher selector from element cache
+     * @param Optional<String> selected
+     */
     this.makeCachedTeacherSelector = function(selected) {
         var node = this.elemcache.teachersel.clone();
         var selnode = node.find('select');
@@ -342,6 +431,13 @@ var schedule = new (function Site() {
         return node;
     }
 
+    /*
+     * Create _normal_ checkbox
+     * @param String title 
+     * @param String disp (alias)
+     * @param Boolean value (selected)
+     * @return DOMElement _checkbox_ 
+     */
     this.createCheckbox = function(title, disp, value) {
         value = value || false;
         var label = $('<label></label>');
@@ -351,6 +447,12 @@ var schedule = new (function Site() {
         return label;
     }
 
+    /*
+     * Create properties selectors (such as mark as consultation, for depot,
+     * replaced with other teacher, uhm, "kp") and append them into element
+     * @param DOMElement elem is target element
+     * @param Optional<Array> props - properties
+     */
     this.createPropsSelectors = function(elem, props) {
         props = props || {};
         props.cons = parseInt(props.cons || 0) == 1;
@@ -363,6 +465,11 @@ var schedule = new (function Site() {
         this.createCheckbox('Замена преподавателя', 'ЗМ', props.replace).appendTo(elem);
     }
 
+    /*
+     * Set state of second subgroup
+     * @param DOMElement elem is block with both subgroups?
+     * @param Boolean state 
+     */
     this.setSecondSubgroupState = function(elem, state) {
         state = Boolean(state);
         elem.find('.subgroup2 select, .subgroup2props input').each(function(i, v) {
@@ -379,9 +486,45 @@ var schedule = new (function Site() {
             }
         });
     }
+    
+    /*
+     * Create cabinet selector or get it from cache
+     * TODO: somehow set current cabinet
+     * @return DOMElement selector
+     */
+    this.makeCabinetSelector = function() {
+        if(this.elemcache.cabselector)
+            return this.elemcache.cabselector.clone();
+        var label = $('<label class="tch-cab"></label>');
+        label.attr('title', 'Кабинет');
+        $('<span>К:</span>').appendTo(label);
+        var select = $('<select class="cab"></select>');
+        for(var i = 0; i < this.tlsinfo.cabinets.length; i++) {
+            var cab = this.tlsinfo.cabinets[i];
+            var option = $('<option></option>');
+            option.attr('value', cab.id);
+            option.text(cab.title);
+            select.append(option);
+        }
+        select.appendTo(label);
+        this.elemcache.cabselector = label;
+        return label;
+    }
 
+    /*
+     * Process one lesson.
+     * 
+     * @param Number num - number of lesson
+     * @param Array lessons is list of lessons
+     * @param Array loads is teacher loads
+     * @return DOMElement one lesson element.
+     * 
+     * XXX: THIS IS VERY UNREADABLE PART OF CODE, YES I KNOW THAT.
+     * XXX: EVENTUALLY, THIS WILL BE REWRITTEN, BUT I HAVE NO IDEA WHEN
+     * TODO: optimize this function
+     */
     this.processLesson = function(num, lessons, loads) {
-        var self = this;
+        var self = this; // A little trick
         var elem = $('<div class="lesson"></div>');
         var lprops = $('<div class="lesson-props"></div>');
 
@@ -397,6 +540,7 @@ var schedule = new (function Site() {
         var lessonsg1 = lessons.lessons.length ? lessons.lessons[0] : {};
         subgroup1.append(this.makeTeacherLoadsSelector(loads, lessonsg1.teacherLoadId));
         subgroup1.append(this.makeCachedTeacherSelector(lessonsg1.replaceTeacherId));
+        // subgroup1.append(this.makeCabinetSelector());
 
         var subgroup1props = $('<div class="subgroup1props"></div>');
         this.createPropsSelectors(subgroup1props, lessonsg1);
@@ -408,6 +552,7 @@ var schedule = new (function Site() {
         var lessonsg2 = lessons.lessons.length > 1 ? lessons.lessons[1] : {};
         subgroup2.append(this.makeTeacherLoadsSelector(loads, lessonsg2.teacherLoadId));
         subgroup2.append(this.makeCachedTeacherSelector(lessonsg2.replaceTeacherId));
+        // subgroup2.append(this.makeCabinetSelector());
 
         var subgroup2props = $('<div class="subgroup2props"></div>');
         this.createPropsSelectors(subgroup2props, lessonsg2);
@@ -416,22 +561,30 @@ var schedule = new (function Site() {
         });
 
         $('<div class="lesson-number"></div>').text(num).appendTo(elem);
-        lprops.appendTo(elem);
-        subgroup1.appendTo(elem);
-        subgroup1props.appendTo(elem);
-        subgroup2.appendTo(elem);
+        lprops.appendTo(elem); // add properties to element
+        subgroup1.appendTo(elem); // same with first subgroup info
+        subgroup1props.appendTo(elem); // and properties
+        subgroup2.appendTo(elem); // and with second, too
         subgroup2props.appendTo(elem);
+        // Set state of second subgroup to enabled, if this is used
         this.setSecondSubgroupState(elem, lessons.type > 0 && lessons.type < 4);
         return elem;
     }
 
     this.saveData = function() {
-        this.setStatus("Сохраняем...", 0);
+        this.setStatus("Сохраняем...", this.L_DEFAULT);
         this.setLockedState(true);
         var result = {
             "items": [],
             "date": $("#dateSelect").val()
         };
+        // XXX: Ok, there's NOT REALLY tricky one
+        // Here we're jumping over courses, groups in them, lessons in them
+        // and eventually creating a result array. Hopefully.
+        // There is nothing strange, really. Except, of course
+        // :NTH-CHILD(X) and something more.
+        // This is just looks as mess, but actually this is the only way
+        // I can imagine right now.
         $(".course").each(function(i, cElem) {
             $(cElem).find(".group").each(function(i, gElem) {
                 $(gElem).find('.lesson').each(function(i, lElem) {
@@ -451,7 +604,9 @@ var schedule = new (function Site() {
                             : null
                         ),
                         "date": result.date,
-                        // "sr": ""
+                        // TODO: uncomment that when cabinets become available
+                        // "cab": lJElem.find(".subgroup1 .cab").val(),
+                        // "sr": "" // what?
                     };
                     if(lesson.teacherLoadId > 0)
                         result.items.push(lesson);
@@ -460,16 +615,18 @@ var schedule = new (function Site() {
                             "number": number,
                             "type": "II",
                             "teacherLoadId": lJElem.find(".subgroup2 .main").val(),
-                            "forTeach": lJElem.find(".subgroup2props :nth-child(1) input")[0].checked ? "1" : "0",
-                            "kp": lJElem.find(".subgroup2props :nth-child(2) input")[0].checked ? "1" : "0",
-                            "cons": lJElem.find(".subgroup2props :nth-child(3) input")[0].checked ? "1" : "0",
+                            "forTeach": lJElem.find(".subgroup2props :nth-child(1) input")[0].checked * 1,
+                            "kp": lJElem.find(".subgroup2props :nth-child(2) input")[0].checked * 1,
+                            "cons": lJElem.find(".subgroup2props :nth-child(3) input")[0].checked * 1,
                             "replaceTeacherId": (
                                 lJElem.find(".subgroup2props :nth-child(4) input")[0].checked
                                 ? lJElem.find(".subgroup2 .repl").val()
                                 : null
                             ),
                             "date": result.date,
-                            // "sr": ""
+                            // TODO: uncomment that when cabinets become available
+                            // "cab": lJElem.find(".subgroup2 .cab").val(),
+                            // "sr": "" // what?
                         };
                         if(lesson.teacherLoadId > 0)
                             result.items.push(lesson);
@@ -477,21 +634,23 @@ var schedule = new (function Site() {
                 });
             });
         });
-        console.log(JSON.stringify(result));
+        if(!!localStorage.getItem('DEV_ENV'))
+            console.log(JSON.stringify(result));
         var self = this;
         $.ajax({
             'type': "POST",
             'url': "<?= Url::to(['/schedule/schedule/save']); ?>",
+            // TODO: put information in JSON, NOT in text (is it JSON?)
+            'dataType': 'text', // TODO: 
             'data': result,
-            'dataType':'text',
             'error': function(xhr) {
                 console.error('Failed:', xhr.responseText);
-                self.setStatus("Ошибка при сохранении", 1);
+                self.setStatus("Ошибка при сохранении", self.L_ERROR);
                 self.setLockedState(false);
             },
             'success': function (response) {
                 console.log('OK', response);
-                self.setStatus("Расписание сохранено", 2);
+                self.setStatus("Расписание сохранено", self.L_SUCCESS);
                 self.setLockedState(false);
             }
         });
@@ -503,11 +662,13 @@ var schedule = new (function Site() {
     }
 })();
 
+// Waiting for page to load completly
 window.addEventListener('load', function() {
     setTimeout(function() {
         $('#dateSelect').val(new Date().toISOString().split("T")[0]);
         schedule.getSchedule(0);
-    }, 1000);
+    }, 1000); // Wait a little more
+    // Binding click events to control buttons
     $('#dateSelect').on('input', function() { schedule.getSchedule(0, false); });
     $('#saveButton').on('click', function() { schedule.saveData(); });
     $('#exportButton').on('click', function() { schedule.exportTable(); });
