@@ -14,11 +14,11 @@
 
     .lesson {
         width: 400px;
-        height: 145px;
+        height: 200px;
         border: 1px solid;
         display: grid;
         grid-template-columns: 20px 1fr 100px;
-        grid-template-rows: 25px 60px 60px;
+        grid-template-rows: 25px 90px 60px;
         grid-template-areas: "num lp lp"
                              "num sb1 sb1p"
                              "num sb2 sb2p";
@@ -50,14 +50,16 @@
         color: gray;
     }
     select.main,
-    select.repl {
+    select.repl,
+    select.cab {
         width: calc(100% - 25.5px) !important;
         height: 24px !important;
         border-right: 0px !important;
     }
     select.main { border-top: 0px; }
     select.repl { border-bottom: 0px; }
-    .tch-sel span {
+    .tch-sel span,
+    .tch-cab span {
         display: inline-block;
         width: 20px;
     }
@@ -67,7 +69,8 @@
         grid-template-columns: 60px 60px;
         grid-template-rows: 25px 25px;
     }
-    .tch-sel {
+    .tch-sel,
+    .tch-cab {
         width: 100% !important;
     }
     .subgroup1props label,
@@ -538,9 +541,9 @@ var schedule = new (function Site() {
 
         var subgroup1 = $('<div class="subgroup1"></div>');
         var lessonsg1 = lessons.lessons.length ? lessons.lessons[0] : {};
+        subgroup1.append(this.makeCabinetSelector());
         subgroup1.append(this.makeTeacherLoadsSelector(loads, lessonsg1.teacherLoadId));
         subgroup1.append(this.makeCachedTeacherSelector(lessonsg1.replaceTeacherId));
-        subgroup1.append(this.makeCabinetSelector());
 
         var subgroup1props = $('<div class="subgroup1props"></div>');
         this.createPropsSelectors(subgroup1props, lessonsg1);
@@ -550,9 +553,9 @@ var schedule = new (function Site() {
 
         var subgroup2 = $('<div class="subgroup2"></div>');
         var lessonsg2 = lessons.lessons.length > 1 ? lessons.lessons[1] : {};
+        subgroup2.append(this.makeCabinetSelector());
         subgroup2.append(this.makeTeacherLoadsSelector(loads, lessonsg2.teacherLoadId));
         subgroup2.append(this.makeCachedTeacherSelector(lessonsg2.replaceTeacherId));
-        subgroup2.append(this.makeCabinetSelector());
 
         var subgroup2props = $('<div class="subgroup2props"></div>');
         this.createPropsSelectors(subgroup2props, lessonsg2);
