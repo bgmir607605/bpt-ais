@@ -10,6 +10,16 @@ class TLS extends Model {
         // $response["versionTLS"] = Yii::$app->ParameterManager->getVersionTLS();
         $response["teachers"] = User::find()->where(['teacher' => '1'])->andWhere(['deleted' => '0'])->orderBy('lName')->asArray()->all();
         $response["courses"] = array();
+        // cabinets 
+        $cabinets = array();
+        $cab['id'] = '1';
+        $cab['title'] = 'hz1';
+        $cabinets[] = $cab;
+        $cab['id'] = '2';
+        $cab['title'] = 'hz2';
+        $cabinets[] = $cab;
+        $response['cabinets'] = $cabinets;
+        // 
         for($course = 1; $course <= 4;$course++){
             // Временный массив для групп текущего курса
             $tmpCourse["groups"] = array();

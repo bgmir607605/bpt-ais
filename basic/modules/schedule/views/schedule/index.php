@@ -540,7 +540,7 @@ var schedule = new (function Site() {
         var lessonsg1 = lessons.lessons.length ? lessons.lessons[0] : {};
         subgroup1.append(this.makeTeacherLoadsSelector(loads, lessonsg1.teacherLoadId));
         subgroup1.append(this.makeCachedTeacherSelector(lessonsg1.replaceTeacherId));
-        // subgroup1.append(this.makeCabinetSelector());
+        subgroup1.append(this.makeCabinetSelector());
 
         var subgroup1props = $('<div class="subgroup1props"></div>');
         this.createPropsSelectors(subgroup1props, lessonsg1);
@@ -552,7 +552,7 @@ var schedule = new (function Site() {
         var lessonsg2 = lessons.lessons.length > 1 ? lessons.lessons[1] : {};
         subgroup2.append(this.makeTeacherLoadsSelector(loads, lessonsg2.teacherLoadId));
         subgroup2.append(this.makeCachedTeacherSelector(lessonsg2.replaceTeacherId));
-        // subgroup2.append(this.makeCabinetSelector());
+        subgroup2.append(this.makeCabinetSelector());
 
         var subgroup2props = $('<div class="subgroup2props"></div>');
         this.createPropsSelectors(subgroup2props, lessonsg2);
@@ -605,7 +605,7 @@ var schedule = new (function Site() {
                         ),
                         "date": result.date,
                         // TODO: uncomment that when cabinets become available
-                        // "cab": lJElem.find(".subgroup1 .cab").val(),
+                        "cab": lJElem.find(".subgroup1 .cab").val(),
                         // "sr": "" // what?
                     };
                     if(lesson.teacherLoadId > 0)
@@ -625,7 +625,7 @@ var schedule = new (function Site() {
                             ),
                             "date": result.date,
                             // TODO: uncomment that when cabinets become available
-                            // "cab": lJElem.find(".subgroup2 .cab").val(),
+                            "cab": lJElem.find(".subgroup2 .cab").val(),
                             // "sr": "" // what?
                         };
                         if(lesson.teacherLoadId > 0)
