@@ -49,6 +49,7 @@ AppAsset::register($this);
                     ['label' => 'Направления', 'url' => ['/schedule/direct']],
                     ['label' => 'Группы', 'url' => ['/schedule/group']],
                     ['label' => 'Дисциплины', 'url' => ['/schedule/discipline']],
+                    ['label' => 'Кабинеты', 'url' => ['/schedule/cabinet']],
                     ['label' => 'Нагрузки', 'url' => ['/schedule/teacherload']],
                     ['label' => 'Расписание', 'url' => ['/schedule/schedule']],
                 ]

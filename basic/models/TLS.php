@@ -11,6 +11,7 @@ class TLS extends Model {
         $response["teachers"] = User::find()->where(['teacher' => '1'])->andWhere(['deleted' => '0'])->orderBy('lName')->asArray()->all();
         $response["courses"] = array();
         // cabinets 
+        // TODO Получить кабинеты из БД
         $cabinets = array();
         $cab['id'] = '1';
         $cab['title'] = 'hz1';
