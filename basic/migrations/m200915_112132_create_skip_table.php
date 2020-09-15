@@ -3,32 +3,31 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%mark}}`.
+ * Handles the creation of table `{{%skip}}`.
  */
-class m200914_124343_create_mark_table extends Migration
+class m200915_112132_create_skip_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('mark', [
+        $this->createTable('skip', [
             'id' => $this->primaryKey(),
             'scheduleId' => $this->integer(),
             'studentId' => $this->integer(),
-            'value' => $this->integer().' DEFAULT NULL',
             'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
 
         $this->createIndex(
-            'idx-mark-scheduleId',
-            'mark',
+            'idx-skip-scheduleId',
+            'skip',
             'scheduleId'
         );
 
         $this->addForeignKey(
-            'fk-mark-scheduleId',
-            'mark',
+            'fk-skip-scheduleId',
+            'skip',
             'scheduleId',
             'schedule',
             'id',
@@ -36,14 +35,14 @@ class m200914_124343_create_mark_table extends Migration
         );
 
         $this->createIndex(
-            'idx-mark-studentId',
-            'mark',
+            'idx-skip-studentId',
+            'skip',
             'studentId'
         );
 
         $this->addForeignKey(
-            'fk-mark-studentId',
-            'mark',
+            'fk-skip-studentId',
+            'skip',
             'studentId',
             'user',
             'id',
@@ -56,6 +55,6 @@ class m200914_124343_create_mark_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('mark');
+        $this->dropTable('skip');
     }
 }
