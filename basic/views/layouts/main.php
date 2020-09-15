@@ -42,6 +42,14 @@ AppAsset::register($this);
                 ]
                 ];
         }
+        if(Yii::$app->user->identity->teacher == 1){
+            $itemsMenu[] = [
+                'label' => 'Преподаватель', 
+                'items' => [
+                    ['label' => 'Журналы', 'url' => ['/teacher/journal']],
+                ]
+                ];
+        }
         if(Yii::$app->user->identity->schedule == 1){
             $itemsMenu[] = [
                 'label' => 'Расписание', 
