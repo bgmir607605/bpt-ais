@@ -2,7 +2,9 @@
 
 /* @var $this yii\web\View */
 use yii\helpers\Html;
-$this->title = 'Журналы групп';
+$this->title = 'Журналы';
+$this->params['breadcrumbs'][] = ['label' => 'Преподаватель'];
+$this->params['breadcrumbs'][] = ['label' => $this->title];
 ?>
 <div class="site-index">
 
@@ -11,6 +13,12 @@ $this->title = 'Журналы групп';
     <h1><?= $this->title; ?></h1>
         <?php
             foreach($teacherloads as $teacherload){
+                echo Html::a($teacherload->group->name, ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId], ['class' => 'profile-link']) .'<br>';
+            }
+        ?>
+        <hr>
+        <?php
+            foreach($replaceTeacherloads as $teacherload){
                 echo Html::a($teacherload->group->name, ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId], ['class' => 'profile-link']) .'<br>';
             }
         ?>

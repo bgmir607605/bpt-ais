@@ -8,6 +8,7 @@ use app\models\StudentInGroup;
 use app\models\User;
 use app\models\Mark;
 use app\models\Skip;
+use app\models\Group;
 
 class JournalController extends DefaultController {
     /**
@@ -19,8 +20,8 @@ class JournalController extends DefaultController {
         // Свои нагрузки
         $teacherloads = Teacherload::find()->select('groupId')->distinct()->where(['userId' => $teacher->id])->all();
         // Замены
-        $replaceTeacherloads = array();
-        // $replaceTeacherloads = $teacher->teacherloadsWhereIReplace;
+        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]); 
+        $replaceTeacherloads = Teacherload::find()->select('groupId')->distinct()->where(['in', 'id', $replaceTeacherloadsIds])->all();
         // возвращаем вид
         return $this->render('index',[
             'teacherloads' => $teacherloads,
@@ -29,14 +30,18 @@ class JournalController extends DefaultController {
     }
     public function actionForGroup($groupId = 0)
     {
+        $group = Group::findOne($groupId);
         $teacher = Yii::$app->user->identity;
         // Свои нагрузки
         $teacherloads = Teacherload::find()->where(['userId' => $teacher->id])->andWhere(['groupId' => $groupId])->all();
         // Замены
         $replaceTeacherloads = array();
         // $replaceTeacherloads = $teacher->teacherloadsWhereIReplace;
+        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]);
+        $replaceTeacherloads = Teacherload::find()->where(['in', 'id', $replaceTeacherloadsIds])->andWhere(['groupId' => $groupId])->all();
         // возвращаем вид
         return $this->render('forGroup',[
+            'group' => $group,
             'teacherloads' => $teacherloads,
             'replaceTeacherloads' => $replaceTeacherloads,
         ]);
@@ -45,10 +50,20 @@ class JournalController extends DefaultController {
     // Страница редактирования оценок по нагрузке
     public function actionTeacherload($id = null)
     {
+        $teacher = Yii::$app->user->identity;
         // Найти эту нагрузку
         $teacherload = Teacherload::find()->where(['id' => $id])->one();
-        // Получить список занятий по данной нагрузке
-        $schedules = Schedule::find()->where(['teacherLoadId' => $id])->orderBy('date')->all();
+        // TODO Далее всё зависит от отношения пользователя к нагрузке
+        // Если пользователь вобще никак не относится - ничего не давать
+        // Если это основная нагрузка пользователя - дать все занятия
+        if($teacherload->userId == $teacher->id){
+            // Получить список занятий по данной нагрузке
+            $schedules = Schedule::find()->where(['teacherLoadId' => $id])->orderBy('date')->all();
+        } else {
+            // Если пользователь кого то заменял - дать только замены
+            $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id])->orderBy('date')->all();
+            
+        }
         // Найти студентов, относящихся к группе нагрузки
         
         $usersIds = StudentInGroup::find()->select('userId')->where(['groupId' => $teacherload->groupId]);
