@@ -3,7 +3,11 @@
 /* @var $this yii\web\View */
 use yii\helpers\Html;
 use yii\helpers\Url;
-// $this->title = $teacherload->name;
+$this->title = $teacherload->discipline->fullName;
+$this->params['breadcrumbs'][] = ['label' => 'Преподаватель'];
+$this->params['breadcrumbs'][] = ['label' => 'Журналы', 'url' => ['/teacher/journal']];
+$this->params['breadcrumbs'][] = ['label' => $teacherload->group->name, 'url' => ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId]];
+$this->params['breadcrumbs'][] = ['label' => $this->title];
 ?>
 <style>
     th, td {
