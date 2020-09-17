@@ -9,7 +9,7 @@ class GroupController extends DefaultController {
     public function actionIndex()
     {
         $groups = Group::find()->where(['deleted' => '0'])->orderBy('name')->all();
-        return $this->render('index', ['groups' => $groups],);
+        return $this->render('index', ['groups' => $groups]);
     }
 
     public function actionStudents($groupId = 0)
