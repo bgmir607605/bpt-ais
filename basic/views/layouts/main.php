@@ -39,6 +39,7 @@ AppAsset::register($this);
                 'label' => 'Админ', 
                 'items' => [
                     ['label' => 'Пользователи', 'url' => ['/admin/user']],
+                    ['label' => 'Группы', 'url' => ['/admin/group']],
                 ]
                 ];
         }
