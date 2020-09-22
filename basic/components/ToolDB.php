@@ -13,9 +13,9 @@ class ToolDB extends Component{
 public function fullBackup() {
     $path = '@app/backups/';
     $fileName = 'dump_' . date('d-m-Y_H-i-s') . '.sql';
-    $log = new Log();
-    $log->message = 'Авторизация администратора. Создание резервной копии '. $fileName;
-    $log->save();
+    // $log = new Log();
+    // $log->message = 'Авторизация администратора. Создание резервной копии '. $fileName;
+    // $log->save();
     
     $path = FileHelper::normalizePath(Yii::getAlias($path));
     $filePath = '';
@@ -36,9 +36,9 @@ public function fullBackup() {
 public function tableBackup($tableName = '') {
     $path = '@app/backups/';
     $fileName = 'dump_'.$tableName.'_' . date('d-m-Y_H-i-s') . '.sql';
-    $log = new Log();
-    $log->message = $fileName;
-    $log->save();
+    // $log = new Log();
+    // $log->message = $fileName;
+    // $log->save();
     
     $path = FileHelper::normalizePath(Yii::getAlias($path));
     if (file_exists($path)) {

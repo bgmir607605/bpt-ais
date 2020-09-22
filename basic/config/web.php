@@ -82,6 +82,9 @@ $config = [
         'toExcel' => [
             'class' => 'app\components\toExcel\ToExcel',
         ],
+        'ToolDB' => [
+            'class' => 'app\components\ToolDB',
+        ],
     ],
     'params' => $params,
 ];
