@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\{Teacherload, User};
+use app\models\{Teacherload, User, Log};
 use yii\web\Controller;
 
 /**
@@ -14,6 +14,11 @@ class ApiController extends Controller
 
 public function actionGetBackup()
     {
+        $log = new Log();
+        $log->ip = $_SERVER['REMOTE_ADDR'];
+        $log->action = $this->route;
+        $log->userId = 'guest';
+        $log->save();
         $file = Yii::$app->ToolDB->fullBackup();
         if (file_exists($file)) { 
             $filename = basename($file); 
