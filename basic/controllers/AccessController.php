@@ -5,6 +5,7 @@ namespace app\controllers;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use Yii;
+use app\models\Log;
 
 /**
  * Default controller for the `admin` module
@@ -17,15 +18,26 @@ class AccessController extends Controller
 
     public function beforeAction($action)
 	{
+        $log = new Log();
+        $log->ip = $_SERVER['REMOTE_ADDR'];
+        $log->action = $this->route;
+
 		if(Yii::$app->user->isGuest){
+            $log->userId = 'guest';
+            $log->save();
             throw new ForbiddenHttpException('Доступ запрещён');
         }
         if(Yii::$app->user->identity->{$this->getRoleName()} != 1){
+            $log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
+            $log->save();
             throw new ForbiddenHttpException('Доступ запрещён');
         }
 		if (!parent::beforeAction($action)) {
+            $log->save();
             return false;
 		}
+        $log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
+        $log->save();
 		return true;
     }
     
