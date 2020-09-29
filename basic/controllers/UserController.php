@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use yii\web\Controller;
 use app\models\User;
+use app\models\Log;
 use yii\web\ForbiddenHttpException;
 use Yii;
 
@@ -15,12 +16,22 @@ class UserController extends Controller
 
     public function beforeAction($action)
 	{
+		$log = new Log();
+        $log->ip = $_SERVER['REMOTE_ADDR'];
+		$log->action = $this->route;
+		
 		if(Yii::$app->user->isGuest){
+			$log->userId = 'guest';
+            $log->save();
             throw new ForbiddenHttpException('Доступ запрещён');
         }
 		if (!parent::beforeAction($action)) {
-            return false;
+			$log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
+            $log->save();
+			return false;
 		}
+		$log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
+		$log->save();
 		return true;
     }
 

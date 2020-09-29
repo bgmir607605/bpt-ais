@@ -51,6 +51,15 @@ AppAsset::register($this);
                 ]
                 ];
         }
+        if(Yii::$app->user->identity->student == 1){
+            $itemsMenu[] = [
+                'label' => 'Студент', 
+                'items' => [
+                    ['label' => 'Оценки', 'url' => ['/student/mark']],
+                    ['label' => 'Пропуски', 'url' => ['/student/skip']],
+                ]
+                ];
+        }
         if(Yii::$app->user->identity->schedule == 1){
             $itemsMenu[] = [
                 'label' => 'Расписание', 
@@ -66,8 +75,6 @@ AppAsset::register($this);
         // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
         // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
         // $itemsMenu[] = ['label' => 'Инспектор', 'url' => ['/inspector']];
-        // $itemsMenu[] = ['label' => 'Студент', 'url' => ['/student']];
-        // $itemsMenu[] = ['label' => 'Преподаватель', 'url' => ['/teacher']];
         $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
         $itemsMenu[] = (
             '<li>'
