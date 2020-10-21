@@ -72,9 +72,24 @@ AppAsset::register($this);
                 ]
             ];
         }
+        if(Yii::$app->user->identity->inspector == 1){
+            $itemsMenu[] = [
+                'label' => 'Инспектор', 
+                'items' => [
+                    ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
+                ]
+            ];
+        }
+        if(Yii::$app->user->identity->groupManager == 1){
+            $itemsMenu[] = [
+                'label' => 'Кл. рук.', 
+                'items' => [
+                    ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                ]
+            ];
+        }
         // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
         // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
-        // $itemsMenu[] = ['label' => 'Инспектор', 'url' => ['/inspector']];
         $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
         $itemsMenu[] = (
             '<li>'

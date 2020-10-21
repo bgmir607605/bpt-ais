@@ -19,18 +19,8 @@ public function actionGetBackup()
         $log->action = $this->route;
         $log->userId = 'guest';
         $log->save();
-        $file = Yii::$app->ToolDB->fullBackup();
-        if (file_exists($file)) { 
-            $filename = basename($file); 
-            $size = filesize($file); 
-            header("Content-Disposition: attachment; filename=$filename"); 
-            header("Content-Length: $size"); 
-            header("Charset: UTF-8"); 
-            header("Content-Type: application/unknown"); 
-            if (@readfile($file)) { 
-                unlink($file); 
-            } 
-        }
+        $content = Yii::$app->ToolDB->getContentOfFullBackup();
+        Yii::$app->response->sendContentAsFile($content, 'backup.sql');
     }
 
     public function actionGetdata($needDate = NULL){
