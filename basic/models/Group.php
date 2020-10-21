@@ -72,4 +72,13 @@ class Group extends \yii\db\ActiveRecord
             $teacherload->markAsDeleted();
         }
     }
+    public function getStudents()
+    {
+        $usersIds = StudentInGroup::find()->select('userId')->where(['groupId' => $this->id])->andWhere(['deleted' => '0']);
+        return User::find()->where(['in', 'id', $usersIds])->andWhere(['deleted' => '0'])->orderBy('lName')->all();
+    }
+    public function getTeacherloads()
+    {
+        return Teacherload::find()->select('id')->where(['groupId' => $this->id])->andWhere(['deleted' => '0'])->asArray()->all();
+    }
 }
