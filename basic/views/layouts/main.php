@@ -76,11 +76,18 @@ AppAsset::register($this);
             $itemsMenu[] = [
                 'label' => 'Инспектор', 
                 'items' => [
-                    ['label' => 'Оценки', 'url' => ['/inspector/journal/group-on-date']],
+                    ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
                 ]
             ];
         }
-        // $itemsMenu[] = ['label' => 'Инспектор', 'url' => ['/inspector']];
+        if(Yii::$app->user->identity->groupManager == 1){
+            $itemsMenu[] = [
+                'label' => 'Кл. рук.', 
+                'items' => [
+                    ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                ]
+            ];
+        }
         // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
         // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
         $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
