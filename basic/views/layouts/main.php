@@ -139,7 +139,7 @@ AppAsset::register($this);
     <div class="container">
         <p class="pull-left">&copy; ГБПОУ БПТ</p>
 
-        <p class="pull-right">Версия <?= Yii::$app->params['version']; ?></p>
+        <p class="pull-right">Версия <?= Yii::$app->version; ?></p>
     </div>
 </footer>
 
