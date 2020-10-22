@@ -11,8 +11,21 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
 ?>
 <style>
     th, td {
-    text-align: center;
-}
+        text-align: center;
+    }
+    .firstColumn {
+        position: absolute;
+        width: 10em;
+        margin-left: -10em;
+        /* left: 0em; */
+        /* top: auto; */
+    }
+    .tableWrap {
+        overflow-x: scroll;
+        margin-left: 10em;
+        /* overflow-y: visible;
+        padding: 0; */
+    }
 </style>
 <div class="site-index">
 
@@ -28,37 +41,39 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
         <h1><?php  // echo $teacherload->name ;?></h1>
         <h2>В клетку можно ставить: 2, 3, 4, 5, н</h2>
         <input type="button" value="Сохранить изменения" id="saveMarks">
-        <table border="solid" id="mytable">
-        <tr>
-        <th></th>
-        <?php
-            foreach($schedules as $schedule){
-                $sweetDate = strtotime($schedule->date);
-                $sweetDate = date('d.m', $sweetDate);
-                echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
-            }
-        ?>
-        </tr>
-        <tr>
-        <th></th>
-        <?php
-            foreach($schedules as $schedule){
-                echo '<th>'.$schedule->type.'</th>';
-            }
-            ?>
-        </tr>
-        <?php
-            foreach($students as $student){
-                echo '<tr>';
-                echo '<td>'.$student->lName.' '.$student->fName.'</td>';
+        <div class="tableWrap">
+            <table border="solid" id="mytable" width="100%">
+            <tr>
+            <th></th>
+            <?php
                 foreach($schedules as $schedule){
-                    echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
+                    $sweetDate = strtotime($schedule->date);
+                    $sweetDate = date('d.m', $sweetDate);
+                    echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
                 }
-                
-                echo '</tr>';
-            }
-        ?>
-        </table>
+            ?>
+            </tr>
+            <tr>
+            <th class="firstColumn"></th>
+            <?php
+                foreach($schedules as $schedule){
+                    echo '<th>'.$schedule->type.'</th>';
+                }
+                ?>
+            </tr>
+            <?php
+                foreach($students as $student){
+                    echo '<tr>';
+                    echo '<td class="firstColumn">'.$student->lName.' '.$student->fName.'</td>';
+                    foreach($schedules as $schedule){
+                        echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
+                    }
+                    
+                    echo '</tr>';
+                }
+            ?>
+            </table>
+        </div>
 
     </div>
 </div>
