@@ -5,6 +5,7 @@
 
 use app\widgets\Alert;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -23,6 +24,14 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script>
+        <?php
+            if(!Yii::$app->user->isGuest){
+                $url = Url::toRoute(['/user/alive']);
+                echo "let timerId = setInterval(() => fetch('$url'), 300000);";
+            }
+        ?>
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
