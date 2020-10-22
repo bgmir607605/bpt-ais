@@ -9,6 +9,51 @@ $this->params['breadcrumbs'][] = ['label' => 'Журналы', 'url' => ['/teach
 $this->params['breadcrumbs'][] = ['label' => $teacherload->group->name, 'url' => ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId]];
 $this->params['breadcrumbs'][] = ['label' => $this->title];
 ?>
+
+<?php
+// TODO Вынести
+function getMonthName($monthNumber = '')
+{
+    switch($monthNumber){
+        case 1:
+            return 'Январь';
+        break;
+        case 2:
+            return 'Февраль';
+        break;
+        case 3:
+            return 'Март';
+        break;
+        case 4:
+            return 'Апрель';
+        break;
+        case 5:
+            return 'Май';
+        break;
+        case 6:
+            return 'Июнь';
+        break;
+        case 7:
+            return 'Июль';
+        break;
+        case 8:
+            return 'Август';
+        break;
+        case 9:
+            return 'Сентябрь';
+        break;
+        case 10:
+            return 'Октябрь';
+        break;
+        case 11:
+            return 'Ноябрь';
+        break;
+        case 12:
+            return 'Декабрь';
+        break;
+    }
+}
+?>
 <style>
     th, td {
         text-align: center;
@@ -46,9 +91,30 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
             <tr>
             <th></th>
             <?php
+            $month = '';
+            $months = [];
                 foreach($schedules as $schedule){
                     $sweetDate = strtotime($schedule->date);
-                    $sweetDate = date('d.m', $sweetDate);
+                    $sweetDate = date('m', $sweetDate);
+                    if($sweetDate != $month){
+                        $months[$sweetDate] = 1;
+                        $month = $sweetDate;
+                    } else {
+                        $months[$sweetDate] += 1;
+                    }
+                }
+                foreach($months as $k => $v){
+                    echo '<th colspan="'.$v.'">'.getMonthName($k).'</th>';
+                }
+            ?>
+            </tr>
+            <tr>
+            <tr>
+            <th></th>
+            <?php
+                foreach($schedules as $schedule){
+                    $sweetDate = strtotime($schedule->date);
+                    $sweetDate = date('d', $sweetDate);
                     echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
                 }
             ?>
