@@ -48,20 +48,34 @@ class JournalController extends DefaultController {
     }
 
     // Страница редактирования оценок по нагрузке
-    public function actionTeacherload($id = null)
+    public function actionTeacherload($id = null, $all = 0)
     {
+        // Дата 2 недели назад
+        $date = date("Y-m-d", mktime(0, 0, 0, date('m'), date('d') - 14, date('Y')));
         $teacher = Yii::$app->user->identity;
         // Найти эту нагрузку
         $teacherload = Teacherload::find()->where(['id' => $id])->one();
         // TODO Далее всё зависит от отношения пользователя к нагрузке
         // Если пользователь вобще никак не относится - ничего не давать
         // Если это основная нагрузка пользователя - дать все занятия
+        // TODO refactor
         if($teacherload->userId == $teacher->id){
             // Получить список занятий по данной нагрузке
-            $schedules = Schedule::find()->where(['teacherLoadId' => $id])->orderBy('date')->all();
+            if($all == 1){
+                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->orderBy('date')->all();
+
+            } else {
+                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['>', 'date', $date])->orderBy('date')->all();
+            }
         } else {
             // Если пользователь кого то заменял - дать только замены
-            $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id])->orderBy('date')->all();
+            if($all == 1){
+                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id])->orderBy('date')->all();
+                
+            } else {
+                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id])->andWhere(['>', 'date', $date])->orderBy('date')->all();
+                
+            }
             
         }
         // Найти студентов, относящихся к группе нагрузки
@@ -74,9 +88,6 @@ class JournalController extends DefaultController {
         $schedulesIds = Schedule::find()->select('id')->where(['teacherloadId' => $id])->orderBy('date');
         $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->all();
         $skips = Skip::find()->where(['in', 'scheduleId', $schedulesIds])->all();
-        // $marks = Yii::$app->db->createCommand('SELECT * FROM mark WHERE sheduleId IN (select id FROM shedule where teacherLoadId = :teacherLoadId order by date)')
-        //     ->bindValue(':teacherLoadId', $id)
-        //     ->queryAll();
         return $this->render('teacherload', [
             'teacherload' => $teacherload,
             'schedules' => $schedules,
@@ -108,13 +119,11 @@ class JournalController extends DefaultController {
         }
         // ПРОПУСКИ занятий
         // теперь будем перебирать занятия сгруппированные по sheduleId
-        // var_dump($skips);
         foreach($skips as $scheduleId => $schedule){
             // При заходе в каждую группу - удалять имеющиеся лценки с эти sheduleId
             Yii::$app->db->createCommand('delete FROM skip WHERE scheduleId = :scheduleId')
             ->bindValue(':scheduleId', $scheduleId)
             ->execute();
-            // var_dump($schedulesIds);
             foreach($schedule as $skip){
                     Yii::$app->db->createCommand()->insert('skip', [
                         'studentId' => $skip["studentId"],

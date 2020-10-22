@@ -57,6 +57,7 @@ function getMonthName($monthNumber = '')
 <style>
     th, td {
         text-align: center;
+        min-width: 30px;
     }
     .firstColumn {
         position: absolute;
@@ -85,11 +86,15 @@ function getMonthName($monthNumber = '')
         ?>
         <h1><?php  // echo $teacherload->name ;?></h1>
         <h2>В клетку можно ставить: 2, 3, 4, 5, н</h2>
+        <?php
+            echo Html::a('Показать все занятия', ['/teacher/journal/teacherload', 'id' => $teacherload->id, 'all' => '1'], ['class' => 'profile-link']).'<br>';
+            echo Html::a('Показать занятия за последние 2 недели', ['/teacher/journal/teacherload', 'id' => $teacherload->id, 'all' => '0'], ['class' => 'profile-link']).'<br>';
+        ?>
         <input type="button" value="Сохранить изменения" id="saveMarks">
         <div class="tableWrap">
             <table border="solid" id="mytable" width="100%">
             <tr>
-            <th></th>
+            <th class="firstColumn"></th>
             <?php
             $month = '';
             $months = [];
@@ -109,8 +114,7 @@ function getMonthName($monthNumber = '')
             ?>
             </tr>
             <tr>
-            <tr>
-            <th></th>
+            <th class="firstColumn"></th>
             <?php
                 foreach($schedules as $schedule){
                     $sweetDate = strtotime($schedule->date);
