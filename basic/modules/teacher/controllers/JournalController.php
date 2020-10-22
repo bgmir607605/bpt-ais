@@ -50,38 +50,29 @@ class JournalController extends DefaultController {
     // Страница редактирования оценок по нагрузке
     public function actionTeacherload($id = null, $all = 0)
     {
-        // Дата 2 недели назад
-        $date = date("Y-m-d", mktime(0, 0, 0, date('m'), date('d') - 14, date('Y')));
         $teacher = Yii::$app->user->identity;
         // Найти эту нагрузку
         $teacherload = Teacherload::find()->where(['id' => $id])->one();
         // TODO Далее всё зависит от отношения пользователя к нагрузке
         // Если пользователь вобще никак не относится - ничего не давать
+        $schedules = Schedule::find()->where(['1' => '0']);
         // Если это основная нагрузка пользователя - дать все занятия
-        // TODO refactor
         if($teacherload->userId == $teacher->id){
             // Получить список занятий по данной нагрузке
-            if($all == 1){
-                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->orderBy('date')->all();
-
-            } else {
-                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['>', 'date', $date])->orderBy('date')->all();
-            }
+            $schedules = Schedule::find()->where(['teacherLoadId' => $id]);
         } else {
             // Если пользователь кого то заменял - дать только замены
-            if($all == 1){
-                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id])->orderBy('date')->all();
-                
-            } else {
-                $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id])->andWhere(['>', 'date', $date])->orderBy('date')->all();
-                
-            }
-            
+            $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id]);
         }
+        // Если за последние 2 недели
+        if($all != 1){
+            $date = date("Y-m-d", mktime(0, 0, 0, date('m'), date('d') - 14, date('Y')));
+            $schedules = $schedules->andWhere(['>', 'date', $date]);
+        }
+        $schedules = $schedules->orderBy('date')->all();
         // Найти студентов, относящихся к группе нагрузки
         
-        $usersIds = StudentInGroup::find()->select('userId')->where(['groupId' => $teacherload->groupId]);
-        $students = User::find()->where(['in', 'id', $usersIds])->orderBy('lName')->all();
+        $students = $teacherload->group->students;
         // // Найти оценки по найденным занятиям
         // // TODO переписать
         $marks = array();
