@@ -9,10 +9,69 @@ $this->params['breadcrumbs'][] = ['label' => 'Журналы', 'url' => ['/teach
 $this->params['breadcrumbs'][] = ['label' => $teacherload->group->name, 'url' => ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId]];
 $this->params['breadcrumbs'][] = ['label' => $this->title];
 ?>
+
+<?php
+// TODO Вынести
+function getMonthName($monthNumber = '')
+{
+    switch($monthNumber){
+        case 1:
+            return 'Январь';
+        break;
+        case 2:
+            return 'Февраль';
+        break;
+        case 3:
+            return 'Март';
+        break;
+        case 4:
+            return 'Апрель';
+        break;
+        case 5:
+            return 'Май';
+        break;
+        case 6:
+            return 'Июнь';
+        break;
+        case 7:
+            return 'Июль';
+        break;
+        case 8:
+            return 'Август';
+        break;
+        case 9:
+            return 'Сентябрь';
+        break;
+        case 10:
+            return 'Октябрь';
+        break;
+        case 11:
+            return 'Ноябрь';
+        break;
+        case 12:
+            return 'Декабрь';
+        break;
+    }
+}
+?>
 <style>
     th, td {
-    text-align: center;
-}
+        text-align: center;
+        min-width: 30px;
+    }
+    .firstColumn {
+        position: absolute;
+        width: 10em;
+        margin-left: -10em;
+        /* left: 0em; */
+        /* top: auto; */
+    }
+    .tableWrap {
+        overflow-x: scroll;
+        margin-left: 10em;
+        /* overflow-y: visible;
+        padding: 0; */
+    }
 </style>
 <div class="site-index">
 
@@ -27,38 +86,64 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
         ?>
         <h1><?php  // echo $teacherload->name ;?></h1>
         <h2>В клетку можно ставить: 2, 3, 4, 5, н</h2>
+        <?php
+            echo Html::a('Показать все занятия', ['/teacher/journal/teacherload', 'id' => $teacherload->id, 'all' => '1'], ['class' => 'profile-link']).'<br>';
+            echo Html::a('Показать занятия за последние 2 недели', ['/teacher/journal/teacherload', 'id' => $teacherload->id, 'all' => '0'], ['class' => 'profile-link']).'<br>';
+        ?>
         <input type="button" value="Сохранить изменения" id="saveMarks">
-        <table border="solid" id="mytable">
-        <tr>
-        <th></th>
-        <?php
-            foreach($schedules as $schedule){
-                $sweetDate = strtotime($schedule->date);
-                $sweetDate = date('d.m', $sweetDate);
-                echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
-            }
-        ?>
-        </tr>
-        <tr>
-        <th></th>
-        <?php
-            foreach($schedules as $schedule){
-                echo '<th>'.$schedule->type.'</th>';
-            }
-            ?>
-        </tr>
-        <?php
-            foreach($students as $student){
-                echo '<tr>';
-                echo '<td>'.$student->lName.' '.$student->fName.'</td>';
+        <div class="tableWrap">
+            <table border="solid" id="mytable" width="100%">
+            <tr>
+            <th class="firstColumn"></th>
+            <?php
+            $month = '';
+            $months = [];
                 foreach($schedules as $schedule){
-                    echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
+                    $sweetDate = strtotime($schedule->date);
+                    $sweetDate = date('m', $sweetDate);
+                    if($sweetDate != $month){
+                        $months[$sweetDate] = 1;
+                        $month = $sweetDate;
+                    } else {
+                        $months[$sweetDate] += 1;
+                    }
                 }
-                
-                echo '</tr>';
-            }
-        ?>
-        </table>
+                foreach($months as $k => $v){
+                    echo '<th colspan="'.$v.'">'.getMonthName($k).'</th>';
+                }
+            ?>
+            </tr>
+            <tr>
+            <th class="firstColumn"></th>
+            <?php
+                foreach($schedules as $schedule){
+                    $sweetDate = strtotime($schedule->date);
+                    $sweetDate = date('d', $sweetDate);
+                    echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
+                }
+            ?>
+            </tr>
+            <tr>
+            <th class="firstColumn"></th>
+            <?php
+                foreach($schedules as $schedule){
+                    echo '<th>'.$schedule->type.'</th>';
+                }
+                ?>
+            </tr>
+            <?php
+                foreach($students as $student){
+                    echo '<tr>';
+                    echo '<td class="firstColumn">'.$student->lName.' '.$student->fName.'</td>';
+                    foreach($schedules as $schedule){
+                        echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
+                    }
+                    
+                    echo '</tr>';
+                }
+            ?>
+            </table>
+        </div>
 
     </div>
 </div>
@@ -115,7 +200,7 @@ $js = <<<JS
                         }
                         marks[markEnt["scheduleId"]].push(markEnt);
                     } else{
-                        if(mark[i] == 'н'){
+                        if(mark[i] == 'н' || mark[i] == 'Н'){
                             let skipEnt = {
                                 "studentId" : idStudent,
                                 "scheduleId" : idLesson
@@ -125,6 +210,9 @@ $js = <<<JS
                             skips[skipEnt["scheduleId"]].push(skipEnt);
                         } else {
                             alert('Ошибка! Недопустимое значение оценки: ' + mark[i]);
+                            invalidCell = document.getElementById('l' + idLesson + 's' + idStudent);
+                            console.log(invalidCell);
+                            invalidCell.style.backgroundColor = 'red';
                             error = true;
                             return;
                         }

@@ -7,6 +7,7 @@ $config = [
     'id' => 'basic',
     'language' => 'ru',
     'name' => 'АИС "БПТ"',
+    'version' => require __DIR__ . '/version.php',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [

@@ -120,4 +120,48 @@ class TeacherloadSearch extends Teacherload
 
         return $dataProvider;
     }
+    public function forTeacher($userId = 0, $params)
+    {
+        $query = Teacherload::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 100,
+                'pageParam' => 'active',
+            ],
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere(['userId' => $userId]);
+        // Не показывать сущности, отмеченные удалёнными
+        $query->andFilterWhere(['deleted' => '0']);
+        
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'id' => $this->id,
+            // 'userId' => $this->userId,
+            'groupId' => $this->groupId,
+            'disciplineId' => $this->disciplineId,
+            'total' => $this->total,
+            'fSub' => $this->fSub,
+            'sSub' => $this->sSub,
+            'cons' => $this->cons,
+            'fSubKP' => $this->fSubKP,
+            'sSubKP' => $this->sSubKP,
+            'sr' => $this->sr,
+            'exam' => $this->exam,
+        ]);
+
+        return $dataProvider;
+    }
 }

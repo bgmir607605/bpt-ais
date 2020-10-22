@@ -31,17 +31,17 @@ class DevController extends Controller
     {
         // Скачать новый бэкап
         $backup = file_get_contents('http://ais.bpt-coders.ru?r=api/get-backup');
-        echo "\033[32m New backup downloaded \033[0m  $file \n";
+        echo "\033[32m New backup downloaded \033[0m  \n";
         // Очистить ДБ
         Yii::$app->getDb()->createCommand("SET foreign_key_checks = 0")->execute();
         foreach (\Yii::$app->db->schema->tableNames as $tableName) {
             Yii::$app->getDb()->createCommand()->dropTable($tableName)->execute();
         }
         Yii::$app->getDb()->createCommand("SET foreign_key_checks = 1")->execute();
-        echo "\033[32m DB cleared \033[0m  $file \n";
+        echo "\033[32m DB cleared \033[0m   \n";
         // Импортировать скачанный бэкап
         Yii::$app->getDb()->createCommand($backup)->execute();
-        echo "\033[32m DB imported \033[0m  $file \n";
+        echo "\033[32m DB imported \033[0m   \n";
         return ExitCode::OK;
     }
 }

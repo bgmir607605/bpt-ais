@@ -76,7 +76,7 @@ $this->title = 'Дневные оценки';
             }
             echo '</tr>';
         }
-        echo '<table border="solid">';
+        echo '</table>';
 
         function getContentOfCell($scheduleId, $studentId, $marks, $skips){
             $result = '';

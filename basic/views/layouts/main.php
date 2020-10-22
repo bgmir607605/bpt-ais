@@ -5,6 +5,7 @@
 
 use app\widgets\Alert;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -23,6 +24,14 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script>
+        <?php
+            if(!Yii::$app->user->isGuest){
+                $url = Url::toRoute(['/user/alive']);
+                echo "let timerId = setInterval(() => fetch('$url'), 300000);";
+            }
+        ?>
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -48,6 +57,7 @@ AppAsset::register($this);
                 'label' => 'Преподаватель', 
                 'items' => [
                     ['label' => 'Журналы', 'url' => ['/teacher/journal']],
+                    ['label' => 'Нагрузки', 'url' => ['/teacher/teacherload']],
                 ]
                 ];
         }
@@ -128,9 +138,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; ГБПОУ БПТ</p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right">Версия <?= Yii::$app->version; ?></p>
     </div>
 </footer>
 
