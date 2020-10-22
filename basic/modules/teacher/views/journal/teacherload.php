@@ -196,7 +196,7 @@ $js = <<<JS
                         }
                         marks[markEnt["scheduleId"]].push(markEnt);
                     } else{
-                        if(mark[i] == 'н'){
+                        if(mark[i] == 'н' || mark[i] == 'Н'){
                             let skipEnt = {
                                 "studentId" : idStudent,
                                 "scheduleId" : idLesson
@@ -206,6 +206,9 @@ $js = <<<JS
                             skips[skipEnt["scheduleId"]].push(skipEnt);
                         } else {
                             alert('Ошибка! Недопустимое значение оценки: ' + mark[i]);
+                            invalidCell = document.getElementById('l' + idLesson + 's' + idStudent);
+                            console.log(invalidCell);
+                            invalidCell.style.backgroundColor = 'red';
                             error = true;
                             return;
                         }
