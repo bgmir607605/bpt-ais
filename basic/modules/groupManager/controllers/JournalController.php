@@ -16,6 +16,7 @@ class JournalController extends DefaultController {
 
     public function actionGroupOnDate($date = null)
     {
+        $date = !empty($date)? $date : date('Y-m-d');
         $students = [];
         $schedules = [];
         $marks = [];
