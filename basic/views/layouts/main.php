@@ -97,6 +97,7 @@ AppAsset::register($this);
                 'label' => 'Кл. рук.', 
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                    ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
                 ]
             ];
         }
