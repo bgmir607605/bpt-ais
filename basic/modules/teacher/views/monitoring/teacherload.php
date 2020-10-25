@@ -62,7 +62,7 @@ table, td, tr, th {
                 $num++;
             };
         }
-        $avg = $sum / $num;
+        $avg = $num > 0 ? $sum / $num : '';
         echo '</td><td><input type="text" name="studentId'.$student->id.'" placeholder="'.round($avg, 2).'" value="'.getMonitoringMark($monitoringMarks, $student->id).'"></td></tr>';
     }
     echo '</table>';
