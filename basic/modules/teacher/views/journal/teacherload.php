@@ -2,15 +2,14 @@
 
 /* @var $this yii\web\View */
 use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
 $this->title = $teacherload->discipline->fullName;
 $this->params['breadcrumbs'][] = ['label' => 'Преподаватель'];
 $this->params['breadcrumbs'][] = ['label' => 'Журналы', 'url' => ['/teacher/journal']];
 $this->params['breadcrumbs'][] = ['label' => $teacherload->group->name, 'url' => ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId]];
 $this->params['breadcrumbs'][] = ['label' => $this->title];
-?>
 
-<?php
 // TODO Вынести
 function getMonthName($monthNumber = '')
 {
@@ -60,15 +59,16 @@ function getMonthName($monthNumber = '')
         min-width: 30px;
     }
     .firstColumn {
+        word-break: break-all;
         position: absolute;
-        width: 10em;
-        margin-left: -10em;
+        width: 15em;
+        margin-left: -15em;
         /* left: 0em; */
         /* top: auto; */
     }
     .tableWrap {
         overflow-x: scroll;
-        margin-left: 10em;
+        margin-left: 15em;
         /* overflow-y: visible;
         padding: 0; */
     }
@@ -85,17 +85,56 @@ function getMonthName($monthNumber = '')
             // var_dump($marks);
         ?>
         <h1><?php  // echo $teacherload->name ;?></h1>
-        <h2>В клетку можно ставить: 2, 3, 4, 5, н</h2>
+        
+        <!-- Форма выбора даты -->
         <?php
-            echo Html::a('Показать все занятия', ['/teacher/journal/teacherload', 'id' => $teacherload->id, 'all' => '1'], ['class' => 'profile-link']).'<br>';
-            echo Html::a('Показать занятия за последние 2 недели', ['/teacher/journal/teacherload', 'id' => $teacherload->id, 'all' => '0'], ['class' => 'profile-link']).'<br>';
+        $url = Url::toRoute(['/teacher/journal/teacherload']);
+            $form = ActiveForm::begin([
+            'id' => 'form-input-example',
+            'method' => 'get',
+            'action' => $url,
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false
+        ]);
         ?>
-        <input type="button" value="Сохранить изменения" id="saveMarks">
-        <div class="tableWrap">
-            <table border="solid" id="mytable" width="100%">
-            <tr>
-            <th class="firstColumn"></th>
-            <?php
+        <input type="hidden" name="id" id="" value="<?= $teacherload->id ; ?>">
+        <input type="date" name="dateFrom" id="" value="<?= $dateFrom ; ?>"> - 
+        <input type="date" name="dateTo" id="" value="<?= $dateTo ; ?>">
+        <input type="hidden" name="all" id="" value="0">
+        <?= Html::submitButton('Показать занятия за указанный период', ['class' => 'btn btn-info']) ?>
+        <?php
+        ActiveForm::end();
+        ?>
+        <?php
+        $url = Url::toRoute(['/teacher/journal/teacherload']);
+            $form = ActiveForm::begin([
+            'id' => 'form-input-example',
+            'method' => 'get',
+            'action' => $url,
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false
+        ]);
+        ?>
+        <input type="hidden" name="id" id="" value="<?= $teacherload->id ; ?>">
+        <input type="hidden" name="all" id="" value="1">
+        <?= Html::submitButton('Показать все занятия', ['class' => 'btn btn-info']) ?>
+        <?php
+        ActiveForm::end();
+        ?>
+        <!-- Форма выбора даты -->
+        <br>
+        <p>В клетку можно ставить: 2, 3, 4, 5, н</p>
+        <?php
+        if(count($schedules) == 0){
+            echo "<p>За указанный диапазон ($dateFrom - $dateTo) занятий не найдено.</p>";
+        } else {
+            echo '
+                <input class="btn btn-success" type="button" value="Сохранить изменения" id="saveMarks">
+                <br>
+                <div class="tableWrap">
+                    <table border="solid" id="mytable" width="100%">
+                    <tr>
+                    <th class="firstColumn"></th>';
             $month = '';
             $months = [];
                 foreach($schedules as $schedule){
@@ -111,39 +150,39 @@ function getMonthName($monthNumber = '')
                 foreach($months as $k => $v){
                     echo '<th colspan="'.$v.'">'.getMonthName($k).'</th>';
                 }
-            ?>
+            echo '</tr>
+            <tr>
+            <th class="firstColumn"></th>
+            ';
+            foreach($schedules as $schedule){
+                $sweetDate = strtotime($schedule->date);
+                $sweetDate = date('d', $sweetDate);
+                echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
+            }
+            echo '
             </tr>
             <tr>
             <th class="firstColumn"></th>
-            <?php
+            ';
+            foreach($schedules as $schedule){
+                echo '<th>'.$schedule->type.'</th>';
+            }
+            echo '</tr>';
+            foreach($students as $student){
+                echo '<tr>';
+                echo '<td class="firstColumn">'.$student->lName.' '.$student->fName.'</td>';
                 foreach($schedules as $schedule){
-                    $sweetDate = strtotime($schedule->date);
-                    $sweetDate = date('d', $sweetDate);
-                    echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
+                    echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
                 }
-            ?>
-            </tr>
-            <tr>
-            <th class="firstColumn"></th>
-            <?php
-                foreach($schedules as $schedule){
-                    echo '<th>'.$schedule->type.'</th>';
-                }
-                ?>
-            </tr>
-            <?php
-                foreach($students as $student){
-                    echo '<tr>';
-                    echo '<td class="firstColumn">'.$student->lName.' '.$student->fName.'</td>';
-                    foreach($schedules as $schedule){
-                        echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
-                    }
-                    
-                    echo '</tr>';
-                }
-            ?>
-            </table>
-        </div>
+                
+                echo '</tr>';
+            }
+            echo '
+                </table>
+            </div>
+            ';
+        }
+        ?>
 
     </div>
 </div>

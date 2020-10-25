@@ -34,7 +34,7 @@ $this->title = 'Моё расписание';
             foreach($schedules as $schedule){
                 $linkText = $schedule->number.'. '. $schedule->teacherLoad->group->name. ' '
                 . $schedule->teacherLoad->discipline->shortName . ' '. $schedule->type;
-                echo Html::a($linkText, ['/teacher/journal/schedule', 'id' => $schedule->id], ['class' => 'profile-link']) .'<br>';
+                echo Html::a($linkText, ['/teacher/journal/teacherload', 'id' => $schedule->teacherLoadId, 'dateFrom' => $date, 'dateTo' => $date], ['class' => 'profile-link']) .'<br>';
             }
 
         ?>

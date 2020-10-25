@@ -48,7 +48,7 @@ class JournalController extends DefaultController {
     }
 
     // Страница редактирования оценок по нагрузке
-    public function actionTeacherload($id = null, $all = 0)
+    public function actionTeacherload($id = null, $all = 0, $dateFrom = NULL, $dateTo = NULL)
     {
         $teacher = Yii::$app->user->identity;
         // Найти эту нагрузку
@@ -64,11 +64,28 @@ class JournalController extends DefaultController {
             // Если пользователь кого то заменял - дать только замены
             $schedules = Schedule::find()->where(['teacherLoadId' => $id])->andWhere(['replaceTeacherId' => $teacher->id]);
         }
-        // Если за последние 2 недели
+
+        // Махинации с временным диапазоном
+        // Если не все
         if($all != 1){
-            $date = date("Y-m-d", mktime(0, 0, 0, date('m'), date('d') - 14, date('Y')));
-            $schedules = $schedules->andWhere(['>', 'date', $date]);
+            if(!empty($dateFrom) && !empty($dateTo)){
+                // Если указаны начало и конец
+                $schedules = $schedules->andWhere(['>=', 'date', $dateFrom]);
+                $schedules = $schedules->andWhere(['<=', 'date', $dateTo]);
+
+            } else {
+                // Иначе по умолчанию берём последние 2 недели
+                $dateFrom = date("Y-m-d", mktime(0, 0, 0, date('m'), date('d') - 14, date('Y')));
+                $dateTo = date('Y-m-d');
+                $schedules = $schedules->andWhere(['>=', 'date', $dateFrom]);
+            }
+        } else {
+            $dateFrom = '2020-09-01';
+            $dateTo = date('Y-m-d');
+
         }
+
+
         $schedules = $schedules->orderBy('date')->all();
         // Найти студентов, относящихся к группе нагрузки
         
@@ -85,34 +102,12 @@ class JournalController extends DefaultController {
             'students' => $students,
             'marks' => $marks,
             'skips' => $skips,
-        ]);
-    }
-    // Страница редактирования оценок по нагрузке
-    public function actionSchedule($id = null)
-    {
-        $teacher = Yii::$app->user->identity;
-        $schedule = Schedule::find()->where(['id' => $id])->andWhere(['deleted' => '0'])->one();
-        if($schedule->teacherLoad->userId != $teacher->id && $schedule->replaceTeacherId != $teacher->id){
-            $schedule = NULL;
-        }
-  
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
 
-        
-        $students = $schedule->teacherLoad->group->students;
-        // // Найти оценки по найденным занятиям
-        // // TODO переписать
-        $marks = array();
-        $marks = Mark::find()->where(['scheduleId' => $schedule->id])->andWhere(['deleted' => '0'])->all();
-        $skips = Skip::find()->where(['scheduleId' => $schedule->id])->andWhere(['deleted' => '0'])->all();
-        $schedules[] = $schedule;
-        return $this->render('teacherload', [
-            'schedules' => $schedules,
-            'students' => $students,
-            'teacherload' => $schedule->teacherLoad,
-            'marks' => $marks,
-            'skips' => $skips,
         ]);
     }
+ 
     // Сохранение оценок
     public function actionSavemarksAndSkips()
     {
