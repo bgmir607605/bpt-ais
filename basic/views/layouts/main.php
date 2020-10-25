@@ -89,6 +89,7 @@ AppAsset::register($this);
                 'label' => 'Инспектор', 
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
+                    ['label' => 'Мониторинг', 'url' => ['/inspector/monitoring']],
                 ]
             ];
         }
