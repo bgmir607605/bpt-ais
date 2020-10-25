@@ -77,12 +77,38 @@ class JournalController extends DefaultController {
         // // TODO переписать
         $marks = array();
         $schedulesIds = Schedule::find()->select('id')->where(['teacherloadId' => $id])->orderBy('date');
-        $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->all();
-        $skips = Skip::find()->where(['in', 'scheduleId', $schedulesIds])->all();
+        $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['deleted' => '0'])->all();
+        $skips = Skip::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['deleted' => '0'])->all();
         return $this->render('teacherload', [
             'teacherload' => $teacherload,
             'schedules' => $schedules,
             'students' => $students,
+            'marks' => $marks,
+            'skips' => $skips,
+        ]);
+    }
+    // Страница редактирования оценок по нагрузке
+    public function actionSchedule($id = null)
+    {
+        $teacher = Yii::$app->user->identity;
+        $schedule = Schedule::find()->where(['id' => $id])->andWhere(['deleted' => '0'])->one();
+        if($schedule->teacherLoad->userId != $teacher->id && $schedule->replaceTeacherId != $teacher->id){
+            $schedule = NULL;
+        }
+  
+
+        
+        $students = $schedule->teacherLoad->group->students;
+        // // Найти оценки по найденным занятиям
+        // // TODO переписать
+        $marks = array();
+        $marks = Mark::find()->where(['scheduleId' => $schedule->id])->andWhere(['deleted' => '0'])->all();
+        $skips = Skip::find()->where(['scheduleId' => $schedule->id])->andWhere(['deleted' => '0'])->all();
+        $schedules[] = $schedule;
+        return $this->render('teacherload', [
+            'schedules' => $schedules,
+            'students' => $students,
+            'teacherload' => $schedule->teacherLoad,
             'marks' => $marks,
             'skips' => $skips,
         ]);
