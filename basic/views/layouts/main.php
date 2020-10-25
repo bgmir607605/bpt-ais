@@ -57,6 +57,8 @@ AppAsset::register($this);
                 'label' => 'Преподаватель', 
                 'items' => [
                     ['label' => 'Журналы', 'url' => ['/teacher/journal']],
+                    ['label' => 'Расписание', 'url' => ['/teacher/schedule']],
+                    ['label' => 'Мониторинг', 'url' => ['/teacher/monitoring']],
                     ['label' => 'Нагрузки', 'url' => ['/teacher/teacherload']],
                 ]
                 ];
@@ -87,6 +89,7 @@ AppAsset::register($this);
                 'label' => 'Инспектор', 
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
+                    ['label' => 'Мониторинг', 'url' => ['/inspector/monitoring']],
                 ]
             ];
         }
@@ -95,6 +98,8 @@ AppAsset::register($this);
                 'label' => 'Кл. рук.', 
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                    ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
+                    ['label' => 'Студенты', 'url' => ['/group-manager/student']],
                 ]
             ];
         }
