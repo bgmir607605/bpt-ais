@@ -58,6 +58,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Журналы', 'url' => ['/teacher/journal']],
                     ['label' => 'Расписание', 'url' => ['/teacher/schedule']],
+                    ['label' => 'Мониторинг', 'url' => ['/teacher/monitoring']],
                     ['label' => 'Нагрузки', 'url' => ['/teacher/teacherload']],
                 ]
                 ];
