@@ -86,7 +86,7 @@ class JournalController extends DefaultController {
         }
 
 
-        $schedules = $schedules->orderBy('date')->all();
+        $schedules = $schedules->andWhere(['deleted' => '0'])->orderBy('date')->all();
         // Найти студентов, относящихся к группе нагрузки
         
         $students = $teacherload->group->students;
