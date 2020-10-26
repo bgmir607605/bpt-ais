@@ -31,6 +31,13 @@ public function fullBackup() {
     }
     return $filePath;
 }
+// Создание резервной копии всей БД
+public function getContentOfFullBackup() {
+    $db = Yii::$app->getDb();
+    $db->password = str_replace("(","\(",$db->password);
+    $dump = shell_exec('mysqldump --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' --skip-add-locks');
+    return $dump;
+}
 
 // Создание резервной копии всей БД
 public function tableBackup($tableName = '') {

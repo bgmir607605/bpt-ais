@@ -5,6 +5,7 @@
 
 use app\widgets\Alert;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -23,6 +24,14 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script>
+        <?php
+            if(!Yii::$app->user->isGuest){
+                $url = Url::toRoute(['/user/alive']);
+                echo "let timerId = setInterval(() => fetch('$url'), 300000);";
+            }
+        ?>
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -48,6 +57,9 @@ AppAsset::register($this);
                 'label' => 'Преподаватель', 
                 'items' => [
                     ['label' => 'Журналы', 'url' => ['/teacher/journal']],
+                    ['label' => 'Расписание', 'url' => ['/teacher/schedule']],
+                    ['label' => 'Мониторинг', 'url' => ['/teacher/monitoring']],
+                    ['label' => 'Нагрузки', 'url' => ['/teacher/teacherload']],
                 ]
                 ];
         }
@@ -72,9 +84,27 @@ AppAsset::register($this);
                 ]
             ];
         }
+        if(Yii::$app->user->identity->inspector == 1){
+            $itemsMenu[] = [
+                'label' => 'Инспектор', 
+                'items' => [
+                    ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
+                    ['label' => 'Мониторинг', 'url' => ['/inspector/monitoring']],
+                ]
+            ];
+        }
+        if(Yii::$app->user->identity->groupManager == 1){
+            $itemsMenu[] = [
+                'label' => 'Кл. рук.', 
+                'items' => [
+                    ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                    ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
+                    ['label' => 'Студенты', 'url' => ['/group-manager/student']],
+                ]
+            ];
+        }
         // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
         // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
-        // $itemsMenu[] = ['label' => 'Инспектор', 'url' => ['/inspector']];
         $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
         $itemsMenu[] = (
             '<li>'
@@ -113,9 +143,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; ГБПОУ БПТ</p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right">Версия <?= Yii::$app->version; ?></p>
     </div>
 </footer>
 

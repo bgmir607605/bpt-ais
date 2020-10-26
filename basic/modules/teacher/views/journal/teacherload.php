@@ -2,17 +2,76 @@
 
 /* @var $this yii\web\View */
 use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
 $this->title = $teacherload->discipline->fullName;
 $this->params['breadcrumbs'][] = ['label' => 'Преподаватель'];
 $this->params['breadcrumbs'][] = ['label' => 'Журналы', 'url' => ['/teacher/journal']];
 $this->params['breadcrumbs'][] = ['label' => $teacherload->group->name, 'url' => ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId]];
 $this->params['breadcrumbs'][] = ['label' => $this->title];
+
+// TODO Вынести
+function getMonthName($monthNumber = '')
+{
+    switch($monthNumber){
+        case 1:
+            return 'Январь';
+        break;
+        case 2:
+            return 'Февраль';
+        break;
+        case 3:
+            return 'Март';
+        break;
+        case 4:
+            return 'Апрель';
+        break;
+        case 5:
+            return 'Май';
+        break;
+        case 6:
+            return 'Июнь';
+        break;
+        case 7:
+            return 'Июль';
+        break;
+        case 8:
+            return 'Август';
+        break;
+        case 9:
+            return 'Сентябрь';
+        break;
+        case 10:
+            return 'Октябрь';
+        break;
+        case 11:
+            return 'Ноябрь';
+        break;
+        case 12:
+            return 'Декабрь';
+        break;
+    }
+}
 ?>
 <style>
     th, td {
-    text-align: center;
-}
+        text-align: center;
+        min-width: 30px;
+    }
+    .firstColumn {
+        word-break: break-all;
+        position: absolute;
+        width: 15em;
+        margin-left: -15em;
+        /* left: 0em; */
+        /* top: auto; */
+    }
+    .tableWrap {
+        overflow-x: scroll;
+        margin-left: 15em;
+        /* overflow-y: visible;
+        padding: 0; */
+    }
 </style>
 <div class="site-index">
 
@@ -26,39 +85,104 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
             // var_dump($marks);
         ?>
         <h1><?php  // echo $teacherload->name ;?></h1>
-        <h2>В клетку можно ставить: 2, 3, 4, 5, н</h2>
-        <input type="button" value="Сохранить изменения" id="saveMarks">
-        <table border="solid" id="mytable">
-        <tr>
-        <th></th>
+        
+        <!-- Форма выбора даты -->
         <?php
+        $url = Url::toRoute(['/teacher/journal/teacherload']);
+            $form = ActiveForm::begin([
+            'id' => 'form-input-example',
+            'method' => 'get',
+            'action' => $url,
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false
+        ]);
+        ?>
+        <input type="hidden" name="id" id="" value="<?= $teacherload->id ; ?>">
+        <input type="date" name="dateFrom" id="" value="<?= $dateFrom ; ?>"> - 
+        <input type="date" name="dateTo" id="" value="<?= $dateTo ; ?>">
+        <input type="hidden" name="all" id="" value="0">
+        <?= Html::submitButton('Показать занятия за указанный период', ['class' => 'btn btn-info']) ?>
+        <?php
+        ActiveForm::end();
+        ?>
+        <?php
+        $url = Url::toRoute(['/teacher/journal/teacherload']);
+            $form = ActiveForm::begin([
+            'id' => 'form-input-example',
+            'method' => 'get',
+            'action' => $url,
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false
+        ]);
+        ?>
+        <input type="hidden" name="id" id="" value="<?= $teacherload->id ; ?>">
+        <input type="hidden" name="all" id="" value="1">
+        <?= Html::submitButton('Показать все занятия', ['class' => 'btn btn-info']) ?>
+        <?php
+        ActiveForm::end();
+        ?>
+        <!-- Форма выбора даты -->
+        <br>
+        <p>В клетку можно ставить: 2, 3, 4, 5, н</p>
+        <?php
+        if(count($schedules) == 0){
+            echo "<p>За указанный диапазон ($dateFrom - $dateTo) занятий не найдено.</p>";
+        } else {
+            echo '
+                <input class="btn btn-success" type="button" value="Сохранить изменения" id="saveMarks">
+                <br>
+                <div class="tableWrap">
+                    <table border="solid" id="mytable" width="100%">
+                    <tr>
+                    <th class="firstColumn"></th>';
+            $month = '';
+            $months = [];
+                foreach($schedules as $schedule){
+                    $sweetDate = strtotime($schedule->date);
+                    $sweetDate = date('m', $sweetDate);
+                    if($sweetDate != $month){
+                        $months[$sweetDate] = 1;
+                        $month = $sweetDate;
+                    } else {
+                        $months[$sweetDate] += 1;
+                    }
+                }
+                foreach($months as $k => $v){
+                    echo '<th colspan="'.$v.'">'.getMonthName($k).'</th>';
+                }
+            echo '</tr>
+            <tr>
+            <th class="firstColumn"></th>
+            ';
             foreach($schedules as $schedule){
                 $sweetDate = strtotime($schedule->date);
-                $sweetDate = date('d.m', $sweetDate);
+                $sweetDate = date('d', $sweetDate);
                 echo '<th class="schedule" id="s'.$schedule->id.'">'.$sweetDate.'</th>';
             }
-        ?>
-        </tr>
-        <tr>
-        <th></th>
-        <?php
+            echo '
+            </tr>
+            <tr>
+            <th class="firstColumn"></th>
+            ';
             foreach($schedules as $schedule){
                 echo '<th>'.$schedule->type.'</th>';
             }
-            ?>
-        </tr>
-        <?php
+            echo '</tr>';
             foreach($students as $student){
                 echo '<tr>';
-                echo '<td>'.$student->lName.' '.$student->fName.'</td>';
+                echo '<td class="firstColumn">'.$student->lName.' '.$student->fName.'</td>';
                 foreach($schedules as $schedule){
                     echo '<td contenteditable class="marks" id="l'.$schedule->id.'s'.$student->id.'">'.getCellContent($schedule->id, $student->id, $marks, $skips).'</td>';
                 }
                 
                 echo '</tr>';
             }
+            echo '
+                </table>
+            </div>
+            ';
+        }
         ?>
-        </table>
 
     </div>
 </div>
@@ -115,7 +239,7 @@ $js = <<<JS
                         }
                         marks[markEnt["scheduleId"]].push(markEnt);
                     } else{
-                        if(mark[i] == 'н'){
+                        if(mark[i] == 'н' || mark[i] == 'Н'){
                             let skipEnt = {
                                 "studentId" : idStudent,
                                 "scheduleId" : idLesson
@@ -125,6 +249,9 @@ $js = <<<JS
                             skips[skipEnt["scheduleId"]].push(skipEnt);
                         } else {
                             alert('Ошибка! Недопустимое значение оценки: ' + mark[i]);
+                            invalidCell = document.getElementById('l' + idLesson + 's' + idStudent);
+                            console.log(invalidCell);
+                            invalidCell.style.backgroundColor = 'red';
                             error = true;
                             return;
                         }

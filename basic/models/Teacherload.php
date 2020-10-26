@@ -57,7 +57,7 @@ class Teacherload extends \yii\db\ActiveRecord
             'userId' => 'Преподаватель',
             'groupId' => 'Группа',
             'disciplineId' => 'Дисциплина/Модуль',
-            'total' => 'Всего',
+            'total' => 'Общ. зан.',
             'fSub' => '1 п/г ПР',
             'sSub' => '2 п/г ПР',
             'cons' => 'Консульации',

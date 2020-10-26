@@ -70,4 +70,8 @@ class UserController extends Controller
 		}
 		return $this->render('changePass');
 	}
+	public function actionAlive()
+	{
+		return ;
+	}
 }
