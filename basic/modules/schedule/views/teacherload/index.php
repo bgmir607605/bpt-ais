@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TeacherloadSearch */
@@ -60,7 +61,19 @@ $this->params['breadcrumbs'][] = $this->title;
             //'sr',
             //'exam',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            // ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {report} {delete}',
+                'buttons' => [
+                    'report' => function ($url,$model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-list" title="Отчёт о выдаче"></span>',
+//                            $url);
+                        Url::toRoute(['/schedule/teacherload/report', 'teacherloadId' => $model->id]));
+                    },
+                ],
+            ],
         ],
     ]); ?>
 
