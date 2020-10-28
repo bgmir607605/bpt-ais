@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use app\assets\CalendarAsset;
 
 class CalendarWidget extends Widget {
-    private $calend_months = 'Январь Февраль Март Апрель Июнь Июль Август '
+    private $calend_months = 'Январь Февраль Март Апрель Май Июнь Июль Август '
                            . 'Сентябрь Октябрь Ноябрь Декабрь';
     private $calend_weekdays = 'Пн. Вт. Ср. Чт. Пт. Сб. Вс.';
     
