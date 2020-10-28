@@ -100,7 +100,21 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         }
     }
 
+    public function getInitials()
+    {
+        return sprintf('%s %s. %s.',
+            $this->lName,
+            mb_substr($this->fName, 0, 1),
+            mb_substr($this->mName, 0, 1)
+        );
+    }
 
+    public function getFullName()
+    {
+        return implode(' ', [
+            $this->lName, $this->fName, $this->mName
+        ]);
+    }
 
     ########################
     // Реализация интерфейса
