@@ -24,26 +24,23 @@ foreach($skips as $skip) {
     }
     echo $calend->run();
     ?>
-    <details>
-        <summary>Список пропусков</summary>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Дисциплина</th>
-                    <th>№ пары</th>
-                    <th>Часов</th>
-                </tr>
-            </thead>
-            <tbody><?php foreach($skips as $skip) {
-                echo Html::beginTag('tr');
-                echo Html::tag('td', $skip->schedule->date);
-                echo Html::tag('td', $skip->schedule->teacherLoad->discipline->shortName);
-                echo Html::tag('td', $skip->schedule->number);
-                echo Html::tag('td', $skip->schedule->hours);
-                echo Html::endTag('tr');
-            } ?></tbody>
-        </table>
-    </details>
-    </ul>
+    <h2>Список пропусков</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Дисциплина</th>
+                <th>№ пары</th>
+                <th>Часов</th>
+            </tr>
+        </thead>
+        <tbody><?php foreach($skips as $skip) {
+            echo Html::beginTag('tr');
+            echo Html::tag('td', $skip->schedule->date);
+            echo Html::tag('td', $skip->schedule->teacherLoad->discipline->shortName);
+            echo Html::tag('td', $skip->schedule->number);
+            echo Html::tag('td', $skip->schedule->hours);
+            echo Html::endTag('tr');
+        } ?></tbody>
+    </table>
 </div>
