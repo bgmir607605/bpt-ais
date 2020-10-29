@@ -120,4 +120,21 @@ class TeacherloadController extends DefaultController
             'dataProvider' => $dataProvider,
         ]);
     }
+    
+    public function actionReport($teacherloadId = 0) {
+        $teacherload = Teacherload::find()->where(['id' => $teacherloadId])->andWhere(['deleted' => '0'])->one();
+//        Ищем выданные занятия
+        $searchModel = new \app\models\ScheduleSearch();
+        $dataProvider = $searchModel->searchForTeacherload($teacherload->id, Yii::$app->request->queryParams);
+//        $groups = Group::find()->wherewhere(['deleted' => '0'])->all();
+//        $groups = ArrayHelper::map($groups, 'id', 'name');
+//        $disciplines = Discipline::find()->where(['deleted' => '0'])->all();
+//        $disciplines = ArrayHelper::map($disciplines, 'id', 'fullName');
+//        Yii::$app->session->setFlash('info', 'Добавление нагрузок осуществляется через страницу "Группы"');
+        return $this->render('report', [
+            'teacherload' => $teacherload,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
 }

@@ -53,16 +53,16 @@ class Schedule extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'date' => 'Date',
-            'number' => 'Number',
-            'type' => 'Type',
-            'teacherLoadId' => 'Teacher Load ID',
-            'cons' => 'Cons',
-            'forTeach' => 'For Teach',
-            'hours' => 'Hours',
-            'kp' => 'Kp',
-            'sr' => 'Sr',
-            'replaceTeacherId' => 'Replace Teacher ID',
+            'date' => 'Дата',
+            'number' => '№ пары',
+            'type' => 'Тип',
+            'teacherLoadId' => 'Нагрузка',
+            'cons' => 'Конс.',
+            'forTeach' => 'Для УЧ',
+            'hours' => 'Часы',
+            'kp' => 'КП',
+            'sr' => 'СР',
+            'replaceTeacherId' => 'Замена',
             'deleted' => 'deleted',
         ];
     }
