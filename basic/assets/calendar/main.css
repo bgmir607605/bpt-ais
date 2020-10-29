@@ -1,0 +1,31 @@
+.w-hkcalendar * {
+    text-align: center;
+}
+
+.w-hkcalendar .c-heading {
+    background: #131313;
+    color: #efefef;
+    border: 0;
+}
+
+.w-hkcalendar .c-week-names {
+    background: #262626;
+    color: #efefef;
+    font-weight: bold;
+    border: 0;
+}
+
+.c-empty-day {
+    opacity: 0.5;
+}
+
+.c-weekend { background: #facfcf; }
+.c-today { background: #cffacf; font-weight: bold; }
+.c-active { background: #cfcffa; }
+.c-active::after { content: '*'; }
+
+.c-weekend.c-today { background: #fafacf; }
+.c-weekend.c-active { background: #facffa; }
+.c-today.c-active { background: #cffafa; }
+
+.c-today.c-weekend.c-active { background: #cfcfcf; }
