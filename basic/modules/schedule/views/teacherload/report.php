@@ -35,8 +35,40 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
     </details>
+    <details open>
+        <summary>Сводная информация по ВСЕМ выданным часам</summary>
     
-
+    <?php
+//    Общие занятия
+    $total = 0;
+    $firstSubGroup = 0;
+    $secondSubGroup = 0;
+    $firstKP = 0;
+    $secondKP = 0;
+    $schedules = $searchModel->searchForTeacherload($teacherload->id, [])->query->all();
+    foreach ($schedules as $item){
+        if($item->type == ''){
+            $total += $item->hours;
+        }
+        if($item->type == 'I'){
+            $firstSubGroup += $item->hours;
+            if($item->kp == 1){
+                $firstKP += $item->hours;
+            }
+        }
+        if($item->type == 'II'){
+            $secondSubGroup += $item->hours;
+            if($item->kp == 1){
+                $secondKP += $item->hours;
+            }
+        }
+    }
+//    var_dump($schedules);
+    echo 'Общие занятия: '.$total.' ч.<br>';
+    echo 'Первая п/г: '.$firstSubGroup.' ч. (из них '.$firstKP.' ч. КП)<br>';
+    echo 'Первая п/г: '.$secondSubGroup.' ч. (из них '.$secondKP.' ч. КП)<br>';
+    ?>
+    </details>
     <details open>
         <summary>Фильр выданных занятий</summary>
         <?php echo $this->render('_searchReport', ['model' => $searchModel, 'teacherload' => $teacherload]); ?>
@@ -45,19 +77,30 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
 //        'filterModel' => $searchModel,
         'columns' => [
-            // ['class' => 'yii\grid\SerialColumn'],
+             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+//            'id',
             'date',
             'type',
 //            'number',
 //            'teacherLoadId',
-            'cons',
-            'forTeach',
             'hours',
-            'kp',
-            'sr',
-            'replaceTeacherId',
+            [
+                'attribute' => 'cons',
+                'format' => 'boolean',
+            ],
+            [
+                'attribute' => 'forTeach',
+                'format' => 'boolean',
+            ],
+            [
+                'attribute' => 'kp',
+                'format' => 'boolean',
+            ],
+            [
+                'attribute' => 'sr',
+                'format' => 'boolean',
+            ],
             [
                 'attribute' => 'replaceTeacherId',
                 'value' => 'replaceTeacher.lName',
