@@ -4,6 +4,7 @@ namespace app\modules\student\controllers;
 use Yii;
 use yii\helpers\Json;
 use app\models\Skip;
+use app\models\Schedule;
 use app\widgets\CalendarWidget;
 
 
@@ -22,7 +23,6 @@ class SkipController extends DefaultController{
         $skips_raw = Skip::find()->where(['studentId' => $student->id])->all();
 
         $skips_group = [];
-        $skips = [];
         $skips_mapping = [];
         
         $skips_hours = 0; $skips_hours_total = 0;
@@ -45,25 +45,14 @@ class SkipController extends DefaultController{
                     'hours' => $schedule->hours
                 ];
             }
-            
-            $skips[] = [
-                'date' => $schedule->date,
-                'discipline' => $schedule->teacherLoad->discipline->shortName,
-                'teacher' => $schedule->teacherLoad->user->getInitials(),
-                'number' => $schedule->number,
-                'hours' => $schedule->hours
-            ];
-            $skips_hours_total += $schedule->hours;
         }
 
         $display_date = CalendarWidget::$calend_months[$q_month - 1] . ' ' . $q_year;
 
         return $this->render('index', [
-            'skips' => $skips,
             'skips_merged' => $skips_group,
             'hours_monthly' => $skips_hours,
             'skips_mapping' => $skips_mapping,
-            'hours_total' => $skips_hours_total,
             'display_date' => $display_date,
             'month' => $q_month,
             'year' => $q_year,

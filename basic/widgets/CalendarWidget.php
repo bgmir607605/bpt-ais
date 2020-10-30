@@ -67,12 +67,12 @@ class CalendarWidget extends Widget {
     {
         $days = [];
         $month_start = mktime(0, 0, 0, $this->month, 1, $this->year);
-        $month_start_wday = date('w', $month_start);
+        $month_start_wday = date('w', $month_start) + 7;
         $days_in_month = date('t', $month_start);
         
         $today = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
 
-        for($j = 0; $j < $month_start_wday - 1; $j++) {
+        for($j = 0; $j < ($month_start_wday - 1) % 7; $j++) {
             $days[] = [
                 'number' => '',
                 'weekpos' => $j,

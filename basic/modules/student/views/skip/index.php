@@ -86,32 +86,6 @@ use yii\helpers\Json;
     $calend->setDateSelectCallback('modalCallback(event);');
     echo $calend->run();
     ?>
-    <i>Цвета:
-        <span class="text-success">Сегодня</span>,
-        <span class="text-danger">выходной</span>,
-        <span class="text-info">пропуск</span>
-    </i>
-    <hr>
-    <h2>Список пропусков</h2>
-    <p>Пропусков за всё время: <?=$hours_total?></p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Дата</th>
-                <th>Дисциплина</th>
-                <th>Преподаватель</th>
-                <th>№ пары</th>
-                <th>Часов</th>
-            </tr>
-        </thead>
-        <tbody><?php foreach($skips as $skip) {
-            echo Html::beginTag('tr');
-            echo Html::tag('td', $skip['date']);
-            echo Html::tag('td', $skip['discipline']);
-            echo Html::tag('td', $skip['teacher']);
-            echo Html::tag('td', $skip['number']);
-            echo Html::tag('td', $skip['hours']);
-            echo Html::endTag('tr');
-        } ?></tbody>
-    </table>
+    <p><i>Цвета: <span class="text-success">Сегодня</span>, <span class="text-danger">выходной</span>, <span class="text-info">пропуск</span></i></p>
+    <p><i>Для подробного списка за день, нажмите на него</i></p>
 </div>
