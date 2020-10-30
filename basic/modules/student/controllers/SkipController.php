@@ -69,20 +69,4 @@ class SkipController extends DefaultController{
             'year' => $q_year,
         ]);
     }
-       
-    public function actionGetSkips($date=NULL)
-    {
-        $response = Yii::$app->response;
-        $response->format = \yii\web\Response::FORMAT_JSON;
-        $response->statusCode = 400;
-        if(is_null($date)) {
-            $response->data = [
-                'message' => 'No data sent'
-            ];
-            return $response;
-        }
-        $response->data = [
-            'date' => $date
-        ];
-    }
 }
