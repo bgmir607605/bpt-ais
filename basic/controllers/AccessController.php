@@ -6,6 +6,7 @@ use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use Yii;
 use app\models\Log;
+use app\models\User;
 
 /**
  * Default controller for the `admin` module
@@ -28,6 +29,7 @@ class AccessController extends Controller
             throw new ForbiddenHttpException('Доступ запрещён');
         }
         if(Yii::$app->user->identity->{$this->getRoleName()} != 1){
+            User::findOne(Yii::$app->user->identity->id)->updateLastDateTime();
             $log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
             $log->save();
             throw new ForbiddenHttpException('Доступ запрещён');
@@ -36,6 +38,7 @@ class AccessController extends Controller
             $log->save();
             return false;
 		}
+        User::findOne(Yii::$app->user->identity->id)->updateLastDateTime();        
         $log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
         $log->save();
 		return true;

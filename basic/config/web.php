@@ -5,6 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'timeZone' => 'Europe/Moscow',
     'language' => 'ru',
     'name' => 'АИС "БПТ"',
     'version' => require __DIR__ . '/version.php',

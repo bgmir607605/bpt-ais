@@ -14,7 +14,7 @@ $this->title = 'Студенты';
         <ol>
         <?php
         foreach($group->students as $student){
-            echo '<li>'.$student->lName.' '.$student->fName.' '.$student->mName.' ('.$student->username.')</li>';
+            echo '<li>'.$student->lName.' '.$student->fName.' '.$student->mName.' ('.$student->username.') '.$student->lastDateTime.'</li>';
         }
         ?>
         </ol>

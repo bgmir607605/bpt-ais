@@ -39,6 +39,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             [['admin', 'schedule', 'inspector', 'teacher', 'groupManager', 'applicantManager', 'student', 'deleted'], 'integer'],
             [['fName', 'mName', 'lName', 'username', 'password'], 'string', 'max' => 255],
+            [['lastDateTime'], 'date', 'format' => 'php:Y-m-d H:i:s'],
         ];
     }
 
@@ -61,6 +62,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'groupManager' => 'Кл. руководитель',
             'applicantManager' => 'Приёмная комиссия',
             'student' => 'Студент',
+            'lastDateTime' => 'Посл. действие',
             'deleted' => 'deleted',
         ];
     }
@@ -68,6 +70,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function getFio()
     {
         return $this->lName.' '.$this->fName.' '.$this->mName.' ';
+    }
+    
+    public function updateLastDateTime(){
+        $this->lastDateTime = date('Y-m-d H:i:s').'';
+//        $this->lastDateTime = new \yii\db\Expression('NOW()');
+        $this->save();
     }
 
     public static function teachers()
