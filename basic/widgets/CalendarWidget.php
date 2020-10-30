@@ -5,22 +5,25 @@ use yii\helpers\Html;
 use app\assets\CalendarAsset;
 
 class CalendarWidget extends Widget {
-    private $calend_months = 'Январь Февраль Март Апрель Май Июнь Июль Август '
-                           . 'Сентябрь Октябрь Ноябрь Декабрь';
-    private $calend_weekdays = 'Пн. Вт. Ср. Чт. Пт. Сб. Вс.';
+    public static $calend_months = [
+        'Январь', 'Февраль', 'Март', 'Апрель', 'Май',
+        'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь',
+        'Ноябрь', 'Декабрь'
+    ];
+    public static $calend_weekdays = [
+        'Пн.', 'Вт.', 'Ср.', 'Чт.', 'Пт.', 'Сб.', 'Вс.'
+    ];
     
-    public $day;
     public $month;
     public $year;
     public $highlights;
+    public $dateChangeCallback;
+    public $dateSelectCallback;
     
     public function init()
     {
         CalendarAsset::register( $this->getView() );
         parent::init();
-
-        $this->calend_months = explode(' ', $this->calend_months);
-        $this->calend_weekdays = explode(' ', $this->calend_weekdays);
 
         $this->month = is_null($this->month) ? date('m') : $this->month;
         $this->year = is_null($this->year) ? date('Y') : $this->year;
@@ -33,15 +36,25 @@ class CalendarWidget extends Widget {
         echo Html::beginTag('thead');
         
         echo Html::beginTag('tr');
-        $heading = $this->calend_months[$this->month - 1] . ' ' . $this->year;
+        $heading = $this::$calend_months[$this->month - 1] . ' ' . $this->year;
+        echo Html::tag('th', '<', [
+            'x-action' => 'date-backward',
+            'class' => 'c-heading',
+            'onclick' => $this->dateChangeCallback
+        ]);
         echo Html::tag('th', $heading, [
-            'colspan' => 7,
+            'colspan' => 5,
             'class' => 'c-heading'
+        ]);
+        echo Html::tag('th', '>', [
+            'x-action' => 'date-forward',
+            'class' => 'c-heading',
+            'onclick' => $this->dateChangeCallback
         ]);
         echo Html::endTag('tr');
 
         echo Html::beginTag('tr');
-        foreach($this->calend_weekdays as $wdname) {
+        foreach($this::$calend_weekdays as $wdname) {
             echo Html::tag('th', $wdname, [
                 'class' => 'c-week-names'
             ]);
@@ -54,17 +67,18 @@ class CalendarWidget extends Widget {
     {
         $days = [];
         $month_start = mktime(0, 0, 0, $this->month, 1, $this->year);
-        $month_start_wday = date('w', $month_start);
+        $month_start_wday = date('w', $month_start) + 7;
         $days_in_month = date('t', $month_start);
         
         $today = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
 
-        for($j = 0; $j < $month_start_wday - 1; $j++) {
+        for($j = 0; $j < ($month_start_wday - 1) % 7; $j++) {
             $days[] = [
                 'number' => '',
                 'weekpos' => $j,
                 'title' => NULL,
-                'today' => false
+                'today' => false,
+                'date' => NULL
             ];
         }
         
@@ -80,7 +94,11 @@ class CalendarWidget extends Widget {
                 'number' => $j,
                 'weekpos' => $i % 7,
                 'title' => $title,
-                'today' => $current_day == $today
+                'today' => $current_day == $today,
+                'date' => sprintf(
+                    '%04d-%02d-%02d',
+                    $this->year, $this->month, $j
+                )
             ];
         }
         
@@ -89,7 +107,8 @@ class CalendarWidget extends Widget {
                 'number' => '',
                 'weekpos' => $i % 7,
                 'title' => NULL,
-                'today' => false
+                'today' => false,
+                'date' => NULL
             ];
             $i++;
         }
@@ -126,7 +145,9 @@ class CalendarWidget extends Widget {
 
             echo Html::tag('td', $day['number'], [
                 'class' => implode(' ', $classes),
-                'title' => $day['title']
+                'title' => $day['title'],
+                'x-date' => $day['date'],
+                'onclick' => $day['number'] ? $this->dateSelectCallback : NULL
             ]);
         }
         echo Html::endTag('tr');
@@ -150,4 +171,15 @@ class CalendarWidget extends Widget {
     {
         $this->highlights[$day] = $title;
     }
+
+    public function setDateChangeCallback($callback)
+    {
+        $this->dateChangeCallback = $callback;
+    }
+    
+    public function setDateSelectCallback($callback)
+    {
+        $this->dateSelectCallback = $callback;
+    }
+    
 }
