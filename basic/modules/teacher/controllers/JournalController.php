@@ -20,7 +20,8 @@ class JournalController extends DefaultController {
         // Свои нагрузки
         $teacherloads = Teacherload::find()->select('groupId')->distinct()->where(['userId' => $teacher->id])->all();
         // Замены
-        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]); 
+        // $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]); 
+        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id])->andWhere(['deleted' => '0']); 
         $replaceTeacherloads = Teacherload::find()->select('groupId')->distinct()->where(['in', 'id', $replaceTeacherloadsIds])->all();
         // возвращаем вид
         return $this->render('index',[
@@ -37,7 +38,8 @@ class JournalController extends DefaultController {
         // Замены
         $replaceTeacherloads = array();
         // $replaceTeacherloads = $teacher->teacherloadsWhereIReplace;
-        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]);
+        // $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]);
+        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id])->andWhere(['deleted' => '0']);
         $replaceTeacherloads = Teacherload::find()->where(['in', 'id', $replaceTeacherloadsIds])->andWhere(['groupId' => $groupId])->all();
         // возвращаем вид
         return $this->render('forGroup',[
