@@ -15,17 +15,35 @@
     border: 0;
 }
 
-.c-empty-day {
+.w-hkcalendar .c-empty-day {
     opacity: 0.5;
 }
 
-.c-weekend { background: #facfcf; }
-.c-today { background: #cffacf; font-weight: bold; }
-.c-active { background: #cfcffa; }
-.c-active::after { content: '*'; }
+.w-hkcalendar .c-weekend { background: #facfcf; }
+.w-hkcalendar .c-today { background: #cffacf; font-weight: bold; }
+.w-hkcalendar .c-active { background: #cfcffa; }
+.w-hkcalendar .c-active::after { content: '*'; }
 
-.c-weekend.c-today { background: #fafacf; }
-.c-weekend.c-active { background: #facffa; }
-.c-today.c-active { background: #cffafa; }
+.w-hkcalendar .c-weekend.c-today { background: #fafacf; }
+.w-hkcalendar .c-weekend.c-active { background: #facffa; }
+.w-hkcalendar .c-today.c-active { background: #cffafa; }
 
-.c-today.c-weekend.c-active { background: #cfcfcf; }
+.w-hkcalendar .c-today.c-weekend.c-active { background: #cfcfcf; }
+
+.w-hkcalendar td[onclick],
+.w-hkcalendar th[onclick] {
+    cursor: pointer !important;
+}
+
+.w-hkcalendar td[onclick]:hover,
+.w-hkcalendar th[onclick]:hover {
+    filter: invert(0.1);
+}
+
+
+.w-hkcalendar td[onclick]:active,
+.w-hkcalendar th[onclick]:active {
+    filter: saturate(3);
+    font-weight: bolder;
+}
+
