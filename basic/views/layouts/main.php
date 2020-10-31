@@ -69,6 +69,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Оценки', 'url' => ['/student/mark']],
                     ['label' => 'Пропуски', 'url' => ['/student/skip']],
+                    ['label' => 'Мониторинг', 'url' => ['/student/monitoring']],
                 ]
                 ];
         }
