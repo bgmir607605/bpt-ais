@@ -18,7 +18,7 @@ $this->title = "Оценки";
                 <?=Html::tag('td', $data['teacherload']->user->getInitials(), [ 'title' => $data['teacherload']->user->getFullName() ])?>
                 <td><?php
                     foreach($data['marks'] as $mark) {
-                        Html::tag('span', $mark->value, [ 'title' => $mark->schedule->date ]);
+                        echo Html::tag('span', $mark->value, [ 'title' => $mark->schedule->date ]);
                     }
                 ?></td>
             </tr><?php } ?>
