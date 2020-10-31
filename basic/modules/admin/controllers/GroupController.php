@@ -33,7 +33,9 @@ class GroupController extends DefaultController {
         $students = explode(';', $students);
         $UsersIds = array();
         for($i = 0; $i < count($students); $i++){
-            $students[$i] = explode(' ', $students[$i]);
+            if(trim($students[$i]) == '')
+                continue;
+            $students[$i] = explode(' ', trim($students[$i]));
             $user = new User();
             $user->lName = trim($students[$i][0]);
             $user->fName = trim($students[$i][1]);
@@ -80,3 +82,4 @@ class GroupController extends DefaultController {
 
     
 }
+

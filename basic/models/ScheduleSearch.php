@@ -14,12 +14,22 @@ class ScheduleSearch extends Schedule
     /**
      * {@inheritdoc}
      */
+    public $dateFrom;
+    public $dateTo;
+    
     public function rules()
     {
         return [
-            [['id', 'number', 'teacherLoadId', 'cons', 'forTeach', 'hours', 'kp', 'sr', 'replaceTeacherId'], 'integer'],
-            [['date', 'type'], 'safe'],
+            [['id', 'number', 'teacherLoadId', 'hours', 'replaceTeacherId'], 'integer'],
+            [['date', 'type', 'dateFrom', 'dateTo', 'sr', 'cons', 'forTeach', 'kp'], 'safe'],
         ];
+    }
+    public function attributeLabels()
+    {
+        $parentsLabels = parent::attributeLabels();
+        $parentsLabels['dateFrom'] = 'С';
+        $parentsLabels['dateTo'] = 'По';
+        return $parentsLabels;
     }
 
     /**
@@ -75,6 +85,56 @@ class ScheduleSearch extends Schedule
 
         $query->andFilterWhere(['like', 'type', $this->type]);
 
+        return $dataProvider;
+    }
+    
+    public function searchForTeacherload($teacherloadId, $params)
+    {
+        $query = Schedule::find();
+
+        // add conditions that should always apply here
+        // Не показывать сущности, отмеченные удалёнными
+        $query->andFilterWhere(['deleted' => '0']);
+        $type = array();
+                if(!empty($params["ScheduleSearch"]["type"])){
+                    foreach($params["ScheduleSearch"]["type"] as $k => $v){
+                        if($v == '0'){
+                            $type[$k] = '';
+                        } else {
+                            $type[$k] = $v;
+                        }
+                    }
+                }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'id' => $this->id,
+            'number' => $this->number,
+            'teacherLoadId' => $teacherloadId,
+            'cons' => $this->cons,
+            'forTeach' => $this->forTeach,
+            'hours' => $this->hours,
+//            'type' => $type,
+            'kp' => $this->kp,
+            'sr' => $this->sr,
+            'replaceTeacherId' => $this->replaceTeacherId,
+        ]);
+
+        $query->andFilterWhere(['in', 'type', $type]);
+        $query->andFilterWhere(['>=', 'date', $this->dateFrom]);
+        $query->andFilterWhere(['<=', 'date', $this->dateTo]);
         return $dataProvider;
     }
 }
