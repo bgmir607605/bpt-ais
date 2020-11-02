@@ -29,5 +29,8 @@ class MonitoringController extends DefaultController {
             'monitoringMarks' => $monitoringMarks,
         ]);
     }
+    public function actionExcel(){
+        Yii::$app->toExcel->getMonitoring();
+    }
 
 }
