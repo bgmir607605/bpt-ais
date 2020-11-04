@@ -7,6 +7,7 @@ use app\models\Group;
 use app\models\Teacherload;
 use app\models\MonitoringMark;
 use app\components\toExcel\Classes\PHPExcel\IOFactory;
+use app\components\toExcel\Classes\PHPExcel;
 
 class ToExcel extends Component{
     protected $date;
@@ -16,15 +17,14 @@ class ToExcel extends Component{
     protected $phpexcel;
     
     public function getMonitoring(){
-        $this->pathFile = \Yii::getAlias('@app') .'/components/toExcel/example.xlsx';
         $this->tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
-        $this->phpexcel = IOFactory::load($this->pathFile); // Создаём объект PHPExcel
+        $this->phpexcel = new PHPExcel();
         $pageIndex = 0;
         $groups = Group::find()->where(['deleted' => '0'])->all();
         foreach ($groups as $group){
-            
-            $this->phpexcel->createSheet($pageIndex, 'sdf'); //  
+            $this->phpexcel->createSheet($pageIndex); //  
             $page = $this->phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
+            $this->phpexcel->getActiveSheet()->setTitle($group->name);
             $teacherloads = Teacherload::find()->where(['groupId' => $group->id])->andWhere(['deleted' => '0'])->all();
             $monitoringMarks = MonitoringMark::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($teacherloads, 'id')])->all();
             $columnindex = 2;
@@ -63,18 +63,9 @@ class ToExcel extends Component{
 
         $objWriter = IOFactory::createWriter($this->phpexcel, 'Excel2007');
         $objWriter->save($this->tempFile);
-        
-        if (file_exists($this->tempFile)) { 
-            $filename = basename($this->tempFile); 
-            $size = filesize($this->tempFile); 
-            header("Content-Disposition: attachment; filename=$filename"); 
-            header("Content-Length: $size"); 
-            header("Charset: UTF-8"); 
-            header("Content-Type: application/unknown"); 
-            if (@readfile($this->tempFile)) { 
-                unlink($this->tempFile); 
-            } 
-        }
+        $excelOutput = file_get_contents($this->tempFile);
+        unlink($this->tempFile);
+        return $excelOutput;
     }
 
     public function getFile($data){

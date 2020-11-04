@@ -30,7 +30,9 @@ class MonitoringController extends DefaultController {
         ]);
     }
     public function actionExcel(){
-        Yii::$app->toExcel->getMonitoring();
+//        TODO Передавать на вход набор данных
+        $content = Yii::$app->toExcel->getMonitoring();
+        Yii::$app->response->sendContentAsFile($content, 'Мониторинг.xlsx');
     }
 
 }
