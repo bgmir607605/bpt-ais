@@ -12,6 +12,7 @@ use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_HeaderF
 use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_SheetView;
 use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_Protection;
 use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_RowDimension;
+use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_RowIterator;
 use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_ColumnDimension;
 use app\components\toExcel\Classes\PHPExcel\Worksheet\PHPExcel_Worksheet_AutoFilter;
 use app\components\toExcel\Classes\PHPExcel\Style\PHPExcel_Style_Color;
