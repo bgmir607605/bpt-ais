@@ -16,11 +16,15 @@ class ToExcel extends Component{
     protected $schedule;
     protected $phpexcel;
     
-    public function getMonitoring(){
+    public function getMonitoring($groupId = 0){
         $this->tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
         $this->phpexcel = new PHPExcel();
         $pageIndex = 0;
-        $groups = Group::find()->where(['deleted' => '0'])->all();
+        if($groupId == 0){
+            $groups = Group::find()->where(['deleted' => '0'])->all();
+        } else{
+            $groups = Group::find()->where(['deleted' => '0'])->andWhere(['id' => $groupId])->all();
+        }
         foreach ($groups as $group){
             $this->phpexcel->createSheet($pageIndex); //  
             $page = $this->phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
