@@ -25,6 +25,8 @@ $this->title = 'Мониторинг';
             echo '<h1>Мониторинг </h1>';
         }
         ?>
+        <?= Html::a('Скачать Excel файл со всеми группами', ['/inspector/monitoring/excel'], ['class' => 'btn btn-info']) ?>
+        <hr>
         <!-- Форма выбора даты -->
         <?php
         $url = Url::toRoute(['/inspector/monitoring']);

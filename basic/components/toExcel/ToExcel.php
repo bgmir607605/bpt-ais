@@ -57,20 +57,6 @@ class ToExcel extends Component{
                 $lineIndex++;
                 
             }
-//            $page->setCellValue("A2", $this->formatDate());
-//            $n = 4;
-//            foreach($this->schedule as $course){
-//                foreach($course["groups"] as $group){
-//                    // var_dump($group);
-//                        $page->setCellValue("A$n", $group['name']);
-//                        foreach($group['schedule'] as $item){
-//                            $address = $this->getAddressForNumber($item['number'], $n);
-//                            $curVal = $page->getCell($address)->getValue();
-//                            $page->setCellValue($address, $curVal.$item["discipline"].' '.$item["teacher"]. "\n");
-//                        }
-//                        $n++;
-//                }
-//            }
             $pageIndex++;
         }
         
