@@ -20,7 +20,13 @@ class MonitoringController extends DefaultController {
         // TODO При необходимости вешать на одного препода несколько групп будем ковырять здесь
         $groupId = GroupManager::find()->where(['userId' => Yii::$app->user->identity->id])->andWhere(['deleted' => '0'])->one()->groupId;
         $group = Group::find()->where(['id' => $groupId])->andWhere(['deleted' => '0'])->one();
-        $teacherloads = Teacherload::find()->where(['groupId' => $groupId])->andWhere(['deleted' => '0'])->all();
+        $tmpTeacherloads = Teacherload::find()->where(['groupId' => $groupId])->andWhere(['deleted' => '0'])->all();
+        $teacherloads = [];
+        foreach($tmpTeacherloads as $item){
+            if($item->countSchedules > 0){
+                $teacherloads[] = $item;
+            }
+        }
         $monitoringMarks = MonitoringMark::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($teacherloads, 'id')])->all();
 
          
@@ -31,6 +37,13 @@ class MonitoringController extends DefaultController {
             'teacherloads' => $teacherloads,
             'monitoringMarks' => $monitoringMarks,
         ]);
+    }
+    
+    public function actionExcel(){
+//        TODO Передавать на вход набор данных
+        $groupId = GroupManager::find()->where(['userId' => Yii::$app->user->identity->id])->andWhere(['deleted' => '0'])->one()->groupId;
+        $content = Yii::$app->toExcel->getMonitoring($groupId);
+        Yii::$app->response->sendContentAsFile($content, 'Мониторинг.xlsx');
     }
 
 }
