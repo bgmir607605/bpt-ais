@@ -2,6 +2,7 @@
 namespace app\components\toExcel\Classes\PHPExcel;
 use \ArrayObject;
 use app\components\toExcel\Classes\PHPExcel\PHPExcel_IComparable;
+use app\components\toExcel\Classes\PHPExcel\PHPExcel_ReferenceHelper;
 use app\components\toExcel\Classes\PHPExcel;
 use app\components\toExcel\Classes\PHPExcel\Shared\PHPExcel_Shared_String;
 use app\components\toExcel\Classes\PHPExcel\PHPExcel_CachedObjectStorageFactory;
@@ -896,8 +897,8 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
 			PHPExcel_Calculation::getInstance($this->_parent)
 			    ->renameCalculationCacheForWorksheet($oldTitle, $newTitle);
             if ($updateFormulaCellReferences)
-				PHPExcel_ReferenceHelper::getInstance()->updateNamedFormulas($this->_parent, $oldTitle, $newTitle);
-        }
+                PHPExcel_ReferenceHelper::getInstance()->updateNamedFormulas($this->_parent, $oldTitle, $newTitle);
+            }
 
         return $this;
     }
