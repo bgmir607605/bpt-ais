@@ -110,4 +110,9 @@ class Teacherload extends \yii\db\ActiveRecord
             $schedule->markAsDeleted();
         }
     }
+    
+    public function getCountSchedules() {
+        $schedules = Schedule::find()->where(['teacherLoadId' => $this->id])->andWhere(['deleted' => '0'])->all();
+        return count($schedules);
+    }
 }

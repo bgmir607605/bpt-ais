@@ -27,33 +27,48 @@ class ToExcel extends Component{
             $this->phpexcel->getActiveSheet()->setTitle($group->name);
             $teacherloads = Teacherload::find()->where(['groupId' => $group->id])->andWhere(['deleted' => '0'])->all();
             $monitoringMarks = MonitoringMark::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($teacherloads, 'id')])->all();
-            $columnindex = 2;
-            $lineIndex = 3;
+            $columnindex = 1;
+            $lineIndex = 1;
+            
+//            Индекс строки начинается с 1, столбца - с 0
+//            $page->getCellByColumnAndRow(30, 2)->setValue('asd123');
+            
+            $actualTeacherloads = [];
+            foreach($teacherloads as $teacherload){
+                if($teacherload->countSchedules > 0){
+                    $actualTeacherloads[] = $teacherload;
+                }
+            }
+            $teacherloads = $actualTeacherloads;
             foreach($teacherloads as $teacherload){
                 $cellValue =  $teacherload->discipline->shortName.'('.$teacherload->user->lName.')';
-                $page->setCellValue($this->getAddressForNumber($columnindex, $lineIndex), $cellValue);
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
                 $columnindex++;
             }
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Ср. знач');
+            $columnindex++;
             $lineIndex++;
             foreach($group->students as $student){
-                $columnindex = 1;
-                $cellValue = $group->name;
-                $page->setCellValue('A1', $cellValue);
+                $startColumnIndex = 0;
+                $columnindex = $startColumnIndex;
                 $cellValue = $student->lName.' '.$student->fName;
-                $page->setCellValue($this->getAddressForNumber($columnindex, $lineIndex), $cellValue);
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
                 $columnindex++;
                 foreach($teacherloads as $teacherload){
                     $cellValue = '';
-//                    $cellValue = $teacherload->discipline->shortName;
                     foreach($monitoringMarks as $mark){
                         if($mark->userId == $student->id && $mark->teacherLoadId == $teacherload->id){
                             $cellValue .= $mark->mark;
                         break;
                         }
                     }
-                    $page->setCellValue($this->getAddressForNumber($columnindex, $lineIndex), $cellValue);
+                    $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
                     $columnindex++;
                 }
+                $startCellCoordinates = $page->getCellByColumnAndRow($startColumnIndex +1, $lineIndex)->getCoordinate();
+                $finishCellCoordinates = $page->getCellByColumnAndRow($columnindex -1, $lineIndex)->getCoordinate();
+                $cellValue = "=AVERAGE($startCellCoordinates:$finishCellCoordinates)";
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
                 $lineIndex++;
                 
             }
@@ -154,6 +169,9 @@ class ToExcel extends Component{
         }
     }
 
+//    TODO адо от неё избавиться. Там где она используется перейти на это
+//    Индекс строки начинается с 1, столбца - с 0
+//    $page->getCellByColumnAndRow(30, 2)->setValue('asd123');
     protected function getAddressForNumber(string $number, $n){
         $address = '';
         switch ($number){
