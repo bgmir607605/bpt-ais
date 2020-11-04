@@ -9,15 +9,19 @@ $this->title = 'Мониторинг';
 ?>
 <style>
     th, td {
-    text-align: center;
-}
+        text-align: center;
+    }
+    tr:nth-child(odd) { 
+        background-color: #daffc3; 
+    }
 </style>
 <div class="site-index">
 
   
 
     <div class="body-content">
-        
+        <?= Html::a('Скачать Excel файл', ['/group-manager/monitoring/excel'], ['class' => 'btn btn-info']) ?>
+        <hr>
         <?php
         echo '<table border="solid">';
         echo '<tr>';

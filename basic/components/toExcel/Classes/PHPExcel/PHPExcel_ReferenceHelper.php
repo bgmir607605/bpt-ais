@@ -1,5 +1,7 @@
 <?php
 namespace app\components\toExcel\Classes\PHPExcel;
+use app\components\toExcel\Classes\PHPExcel;
+use app\components\toExcel\Classes\PHPExcel\Cell\PHPExcel_Cell_DataType;
 /**
  * PHPExcel
  *

@@ -1120,8 +1120,12 @@ class PHPExcel_Writer_Excel2007_Worksheet extends PHPExcel_Writer_Excel2007_Writ
 
 						break;
 					case 'f':			// Formula
+                                        //
+                                        //
+                                                
 						$attributes = $pCell->getFormulaAttributes();
-						if($attributes['t'] == 'array') {
+                                                
+//						if($attributes['t'] == 'array') {
 							$objWriter->startElement('f');
 							$objWriter->writeAttribute('t', 'array');
 							$objWriter->writeAttribute('ref', $pCellAddress);
@@ -1129,9 +1133,9 @@ class PHPExcel_Writer_Excel2007_Worksheet extends PHPExcel_Writer_Excel2007_Writ
 							$objWriter->writeAttribute('ca', '1');
 							$objWriter->text(substr($cellValue, 1));
 							$objWriter->endElement();
-						} else {
-							$objWriter->writeElement('f', substr($cellValue, 1));
-						}
+//						} else {
+//							$objWriter->writeElement('f', substr($cellValue, 1));
+//						}
 						if ($this->getParentWriter()->getOffice2003Compatibility() === false) {
 							if ($this->getParentWriter()->getPreCalculateFormulas()) {
 //								$calculatedValue = $pCell->getCalculatedValue();

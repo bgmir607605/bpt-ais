@@ -2,8 +2,12 @@
 namespace app\components\toExcel;
 
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 use app\models\Group;
+use app\models\Teacherload;
+use app\models\MonitoringMark;
 use app\components\toExcel\Classes\PHPExcel\IOFactory;
+use app\components\toExcel\Classes\PHPExcel;
 
 class ToExcel extends Component{
     protected $date;
@@ -11,6 +15,77 @@ class ToExcel extends Component{
     protected $tempFile;
     protected $schedule;
     protected $phpexcel;
+    
+    public function getMonitoring($groupId = 0){
+        $this->tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
+        $this->phpexcel = new PHPExcel();
+        $pageIndex = 0;
+        if($groupId == 0){
+            $groups = Group::find()->where(['deleted' => '0'])->all();
+        } else{
+            $groups = Group::find()->where(['deleted' => '0'])->andWhere(['id' => $groupId])->all();
+        }
+        foreach ($groups as $group){
+            $this->phpexcel->createSheet($pageIndex); //  
+            $page = $this->phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
+            $this->phpexcel->getActiveSheet()->setTitle($group->name);
+            $teacherloads = Teacherload::find()->where(['groupId' => $group->id])->andWhere(['deleted' => '0'])->all();
+            $monitoringMarks = MonitoringMark::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($teacherloads, 'id')])->all();
+            $columnindex = 1;
+            $lineIndex = 1;
+            
+//            Индекс строки начинается с 1, столбца - с 0
+//            $page->getCellByColumnAndRow(30, 2)->setValue('asd123');
+            
+            $actualTeacherloads = [];
+            foreach($teacherloads as $teacherload){
+                if($teacherload->countSchedules > 0){
+                    $actualTeacherloads[] = $teacherload;
+                }
+            }
+            $teacherloads = $actualTeacherloads;
+            foreach($teacherloads as $teacherload){
+                $cellValue =  $teacherload->discipline->shortName.'('.$teacherload->user->lName.')';
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+                $columnindex++;
+            }
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Ср. знач');
+            $columnindex++;
+            $lineIndex++;
+            foreach($group->students as $student){
+                $startColumnIndex = 0;
+                $columnindex = $startColumnIndex;
+                $cellValue = $student->lName.' '.$student->fName;
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+                $columnindex++;
+                foreach($teacherloads as $teacherload){
+                    $cellValue = '';
+                    foreach($monitoringMarks as $mark){
+                        if($mark->userId == $student->id && $mark->teacherLoadId == $teacherload->id){
+                            $cellValue .= $mark->mark;
+                        break;
+                        }
+                    }
+                    $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+                    $columnindex++;
+                }
+                $startCellCoordinates = $page->getCellByColumnAndRow($startColumnIndex +1, $lineIndex)->getCoordinate();
+                $finishCellCoordinates = $page->getCellByColumnAndRow($columnindex -1, $lineIndex)->getCoordinate();
+                $cellValue = "=AVERAGE($startCellCoordinates:$finishCellCoordinates)";
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+                $lineIndex++;
+                
+            }
+            $pageIndex++;
+        }
+        
+
+        $objWriter = IOFactory::createWriter($this->phpexcel, 'Excel2007');
+        $objWriter->save($this->tempFile);
+        $excelOutput = file_get_contents($this->tempFile);
+        unlink($this->tempFile);
+        return $excelOutput;
+    }
 
     public function getFile($data){
         $this->schedule = $data["container"];
@@ -98,6 +173,9 @@ class ToExcel extends Component{
         }
     }
 
+//    TODO адо от неё избавиться. Там где она используется перейти на это
+//    Индекс строки начинается с 1, столбца - с 0
+//    $page->getCellByColumnAndRow(30, 2)->setValue('asd123');
     protected function getAddressForNumber(string $number, $n){
         $address = '';
         switch ($number){
@@ -116,8 +194,92 @@ class ToExcel extends Component{
             case 5:
             $address = "H$n";
             break;
+            case 6:
+            $address = "I$n";
+            break;
+            case 7:
+            $address = "J$n";
+            break;
+            case 8:
+            $address = "K$n";
+            break;
+            case 9:
+            $address = "L$n";
+            break;
+            case 10:
+            $address = "M$n";
+            break;
+            case 11:
+            $address = "N$n";
+            break;
+            case 12:
+            $address = "O$n";
+            break;
+            case 13:
+            $address = "P$n";
+            break;
+            case 14:
+            $address = "Q$n";
+            break;
+            case 15:
+            $address = "R$n";
+            break;
+            case 16:
+            $address = "S$n";
+            break;
+            case 17:
+            $address = "T$n";
+            break;
+            case 18:
+            $address = "U$n";
+            break;
+            case 19:
+            $address = "V$n";
+            break;
+            case 20:
+            $address = "W$n";
+            break;
+            case 21:
+            $address = "X$n";
+            break;
+            case 22:
+            $address = "Y$n";
+            break;
+            case 23:
+            $address = "Z$n";
+            break;
+            case 24:
+            $address = "AA$n";
+            break;
+            case 25:
+            $address = "AB$n";
+            break;
+            case 26:
+            $address = "AC$n";
+            break;
+            case 27:
+            $address = "AD$n";
+            break;
+            case 28:
+            $address = "AE$n";
+            break;
+            case 29:
+            $address = "AF$n";
+            break;
+            case 30:
+            $address = "AG$n";
+            break;
+            case 31:
+            $address = "AH$n";
+            break;
+            case 32:
+            $address = "AJ$n";
+            break;
+            case 33:
+            $address = "AK$n";
+            break;
             default:
-            $address = "A$n";
+            $address = "AL$n";
         }
         return $address;
     }
