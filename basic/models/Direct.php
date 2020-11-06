@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "direct".
  *
@@ -13,7 +11,7 @@ use Yii;
  * @property string $type
  * @property int|null $forApplicant
  */
-class Direct extends \yii\db\ActiveRecord
+class Direct extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -49,19 +47,25 @@ class Direct extends \yii\db\ActiveRecord
             'deleted' => 'deleted',
         ];
     }
-    public function markAsDeleted()
+    public function deleteDependent()
     {
-        $this->deleted = '1';
-        $this->save();
-        // Привязанные группы
-        $groups = Group::find()->where(['directId' => $this->id])->all();
-        foreach($groups as $group){
-            $group->markAsDeleted();
+        /**
+         * Зависят таблицы
+         * group
+         * discipline
+         */
+        foreach($this->groups as $item){
+            $item->delete();
         }
-        // Привязанные дисциплины
-        $disciplines = Discipline::find()->where(['directId' => $this->id])->all();
-        foreach($disciplines as $discipline){
-            $discipline->markAsDeleted();
+        foreach($this->disciplines as $item){
+            $item->delete();
         }
+    }
+    
+    public function getGroups() {
+        return Group::findForDirect($this->id);
+    }
+    public function getDisciplines() {
+        return Discipline::findForDirect($this->id);
     }
 }
