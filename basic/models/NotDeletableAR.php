@@ -35,7 +35,7 @@ class NotDeletableAR extends \yii\db\ActiveRecord {
      * Ппомечает удалёнными зависящие данные
      * Объявляется и рализуется в наследующих классах
      */
-//    public function deleteDependent()
+//    protected function deleteDependent()
 //    {
 //       
 //    }
