@@ -18,9 +18,11 @@ class JournalController extends DefaultController {
     {
         $teacher = Yii::$app->user->identity;
         // Свои нагрузки
+        // needRefactoring user->teacherloads
         $teacherloads = Teacherload::find()->select('groupId')->distinct()->where(['userId' => $teacher->id])->all();
         // Замены
         // $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]); 
+        // needRefactoring user->teacherloadsWhereIamReplacer
         $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id])->andWhere(['deleted' => '0']); 
         $replaceTeacherloads = Teacherload::find()->select('groupId')->distinct()->where(['in', 'id', $replaceTeacherloadsIds])->all();
         // возвращаем вид
@@ -31,11 +33,14 @@ class JournalController extends DefaultController {
     }
     public function actionForGroup($groupId = 0)
     {
+        // needRefactoring Group::findOneNotDeleted
         $group = Group::findOne($groupId);
         $teacher = Yii::$app->user->identity;
         // Свои нагрузки
+        // needRefactoring user->teacherloads
         $teacherloads = Teacherload::find()->where(['userId' => $teacher->id])->andWhere(['groupId' => $groupId])->all();
         // Замены
+        // needRefactoring user->teacherloadsWhereIamReplacer
         $replaceTeacherloads = array();
         // $replaceTeacherloads = $teacher->teacherloadsWhereIReplace;
         // $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]);
@@ -54,8 +59,10 @@ class JournalController extends DefaultController {
     {
         $teacher = Yii::$app->user->identity;
         // Найти эту нагрузку
+        // needRefactoring Teacherload::findOneNotDeleted
         $teacherload = Teacherload::find()->where(['id' => $id])->one();
         // TODO Далее всё зависит от отношения пользователя к нагрузке
+        // needRefactoring вынести эту логику
         // Если пользователь вобще никак не относится - ничего не давать
         $schedules = Schedule::find()->where(['1' => '0']);
         // Если это основная нагрузка пользователя - дать все занятия
@@ -95,6 +102,7 @@ class JournalController extends DefaultController {
         // // Найти оценки по найденным занятиям
         // // TODO переписать
         $marks = array();
+        // needRefactoring MarkSet SkipSet
         $schedulesIds = Schedule::find()->select('id')->where(['teacherloadId' => $id])->orderBy('date');
         $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['deleted' => '0'])->all();
         $skips = Skip::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['deleted' => '0'])->all();
@@ -120,10 +128,12 @@ class JournalController extends DefaultController {
         // теперь будем перебирать занятия сгруппированные по sheduleId
         foreach($marks as $scheduleId => $schedule){
             // При заходе в каждую группу - удалять имеющиеся лценки с эти sheduleId
+            // needRefactoring переписать на построитель
             Yii::$app->db->createCommand('delete FROM mark WHERE scheduleId = :scheduleId')
             ->bindValue(':scheduleId', $scheduleId)
             ->execute();
             foreach($schedule as $mark){
+                    // needRefactoring переписать на построитель
                     Yii::$app->db->createCommand()->insert('mark', [
                         'value' => $mark["value"],
                         'studentId' => $mark["studentId"],
@@ -133,6 +143,7 @@ class JournalController extends DefaultController {
         }
         // ПРОПУСКИ занятий
         // теперь будем перебирать занятия сгруппированные по sheduleId
+        // needRefactoring переписать на построители
         foreach($skips as $scheduleId => $schedule){
             // При заходе в каждую группу - удалять имеющиеся лценки с эти sheduleId
             Yii::$app->db->createCommand('delete FROM skip WHERE scheduleId = :scheduleId')
