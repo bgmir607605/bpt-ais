@@ -29,9 +29,13 @@ abstract class NotDeletableAR extends \yii\db\ActiveRecord {
      * Фактически запись не удаляется
      */
     public function delete() {
-        $this->deleted = '1';
-        $this->save();
+        // Сначала удалить зависимые данные,
+        // иначе они потом не пройдут валидацию
         $this->deleteDependent();
+        $this->deleted = '1';        
+        $this->save();
+//        if(!$this->save())
+//    print_r($this->getErrors());
     }
     /**
      * Ппомечает удалёнными зависящие данные
