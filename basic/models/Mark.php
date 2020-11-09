@@ -16,7 +16,7 @@ use Yii;
  * @property Schedule $schedule
  * @property StudentInGroup $student
  */
-class Mark extends \yii\db\ActiveRecord
+class Mark extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -70,5 +70,14 @@ class Mark extends \yii\db\ActiveRecord
     public function getStudent()
     {
         return $this->hasOne(StudentInGroup::className(), ['id' => 'studentId']);
+    }
+    
+    protected function deleteDependent() {
+//        От оценок ничего не зависит, никого больше не удаляем
+    }
+
+
+    public static function findForSchedule($scheduleId = null){
+        return self::find()->where(['scheduleId' => $scheduleId])->all();
     }
 }
