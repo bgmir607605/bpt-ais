@@ -59,12 +59,13 @@ class Group extends NotDeletableAR
           * studentInGroup
           * teacherload
           */
-        foreach($this->managers as $item){
-             $item->delete();
-         }
-        foreach(StudentInGroup::findForGroup($this->id) as $item){
-            $item->delete();
-        }
+        // TODO доделать
+//        foreach($this->managers as $item){
+//             $item->delete();
+//         }
+//        foreach(StudentInGroup::findForGroup($this->id) as $item){
+//            $item->delete();
+//        }
         foreach($this->teacherloads as $item){
             $item->delete();
         }
@@ -88,5 +89,9 @@ class Group extends NotDeletableAR
     
     function getManagers() {
         return GroupManager::findForGroup($this->id);
+    }
+    
+    public static function findForDirect($directId = null) {
+        return self::find()->where(['directId' => $directId])->all();
     }
 }
