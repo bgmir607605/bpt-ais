@@ -21,7 +21,7 @@ use Yii;
  * @property int $applicantManager
  * @property int $student
  */
-class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
+class User extends NotDeletableAR implements \yii\web\IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -168,6 +168,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validateAuthKey($authKey)
     {
         // 
+    }
+
+    protected function deleteDependent() {
+        
     }
 
 }

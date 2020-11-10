@@ -47,7 +47,7 @@ class Direct extends NotDeletableAR
             'deleted' => 'deleted',
         ];
     }
-    public function deleteDependent()
+    protected function deleteDependent()
     {
         /**
          * Зависят таблицы

@@ -16,7 +16,7 @@ use Yii;
  * @property Group $group
  * @property User $user
  */
-class StudentInGroup extends \yii\db\ActiveRecord
+class StudentInGroup extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -80,4 +80,9 @@ class StudentInGroup extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'userId']);
     }
+
+    protected function deleteDependent() {
+        
+    }
+
 }

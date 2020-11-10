@@ -16,7 +16,7 @@ use Yii;
  * @property Direct $direct
  * @property Teacherload[] $teacherloads
  */
-class Discipline extends \yii\db\ActiveRecord
+class Discipline extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -82,4 +82,9 @@ class Discipline extends \yii\db\ActiveRecord
             $teacherload->markAsDeleted();
         }
     }
+
+    protected function deleteDependent() {
+        
+    }
+
 }
