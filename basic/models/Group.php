@@ -76,7 +76,7 @@ class Group extends NotDeletableAR
         return $this->hasOne(Direct::className(), ['id' => 'directId']);
     }
 
-    public function getStudentsAsUsers()
+    public function getStudents()
     {
         $usersIds = StudentInGroup::find()->select('userId')->where(['groupId' => $this->id])->andWhere(['deleted' => '0']);
         return User::find()->where(['in', 'id', $usersIds])->andWhere(['deleted' => '0'])->orderBy('lName')->all();
