@@ -70,6 +70,7 @@ $this->title = 'Посещаемость';
                 ?>
             </tr>
         <?php
+        $totalSum = 0;
         foreach ($group->students as $student){
             echo '<tr><td>'.$student->lName;
             $sumForMonth = 0;
@@ -83,10 +84,12 @@ $this->title = 'Посещаемость';
                 echo '</td>';
             }
             echo '<th>'.$sumForMonth.'</th>';
+            $totalSum += $sumForMonth;
             echo '</tr>';
         }
         ?>
         </table>
+        <p>Итого: <?= $totalSum ?></p>
         <?php
         
         function getSumForStudentByDay($skips, $studentId, $date){
