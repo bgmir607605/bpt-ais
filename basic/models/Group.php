@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "group".
  *
@@ -14,7 +12,7 @@ use Yii;
  *
  * @property Direct $direct
  */
-class Group extends \yii\db\ActiveRecord
+class Group extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -51,34 +49,49 @@ class Group extends \yii\db\ActiveRecord
             'deleted' => 'deleted',
         ];
     }
+    
+    
+    protected function deleteDependent()
+    {
+         /**
+          * Привязаны таблицы
+          * groupManager
+          * studentInGroup
+          * teacherload
+          */
+        // TODO доделать
+//        foreach($this->managers as $item){
+//             $item->delete();
+//         }
+//        foreach(StudentInGroup::findForGroup($this->id) as $item){
+//            $item->delete();
+//        }
+        foreach($this->teacherloads as $item){
+            $item->delete();
+        }
+    }
 
-    /**
-     * Gets query for [[Direct]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getDirect()
     {
         return $this->hasOne(Direct::className(), ['id' => 'directId']);
     }
 
-    public function markAsDeleted()
-    {
-        $this->deleted = '1';
-        $this->save();
-        // Привязанные нагрузки
-        $teacherloads = Teacherload::find()->where(['groupId' => $this->id])->all();
-        foreach($teacherloads as $teacherload){
-            $teacherload->markAsDeleted();
-        }
-    }
-    public function getStudents()
+    public function getStudentsAsUsers()
     {
         $usersIds = StudentInGroup::find()->select('userId')->where(['groupId' => $this->id])->andWhere(['deleted' => '0']);
         return User::find()->where(['in', 'id', $usersIds])->andWhere(['deleted' => '0'])->orderBy('lName')->all();
     }
+    
     public function getTeacherloads()
     {
-        return Teacherload::find()->select('id')->where(['groupId' => $this->id])->andWhere(['deleted' => '0'])->asArray()->all();
+        return Teacherload::findForGroup($this->id);
+    }
+    
+    function getManagers() {
+        return GroupManager::findForGroup($this->id);
+    }
+    
+    public static function findForDirect($directId = null) {
+        return self::find()->where(['directId' => $directId])->all();
     }
 }

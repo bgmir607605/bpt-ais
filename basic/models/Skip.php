@@ -15,7 +15,7 @@ use Yii;
  * @property Schedule $schedule
  * @property User $student
  */
-class Skip extends \yii\db\ActiveRecord
+class Skip extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -69,4 +69,13 @@ class Skip extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'studentId']);
     }
+
+    protected function deleteDependent() {
+        
+    }
+    
+    public static function findForSchedule($scheduleId = null){
+        return self::find()->where(['scheduleId' => $scheduleId])->all();
+    }
+
 }

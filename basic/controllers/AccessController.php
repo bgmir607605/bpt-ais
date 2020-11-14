@@ -63,11 +63,10 @@ class AccessController extends Controller
         ]);
     }
 
-    // При удалении любой сущности она остаётся и помечается как удалённая
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $model->markAsDeleted();
+        $model->delete();
 
         return $this->redirect(['index']);
     }

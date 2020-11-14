@@ -9,3 +9,10 @@ modules:
       - Asserts
       - Yii2:
             part: [orm, email, fixtures]
+      - Db:
+         dsn: 'mysql:host=localhost;dbname=bpt-ais-test'
+         user: 'root'
+         password: '0000'
+         populate: true # load dump before all tests
+         cleanup: false # load dump for each test
+         dump: 'tests/_data/dump.sql'

@@ -22,7 +22,7 @@ use Yii;
  * @property User $replaceTeacher
  * @property Teacherload $teacherLoad
  */
-class Schedule extends \yii\db\ActiveRecord
+class Schedule extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -87,9 +87,24 @@ class Schedule extends \yii\db\ActiveRecord
         return $this->hasOne(Teacherload::className(), ['id' => 'teacherLoadId']);
     }
 
-    public function markAsDeleted()
-    {
-        $this->deleted = '1';
-        $this->save();
+    public function deleteDependent() {
+        foreach($this->marks as $item){
+            $item->delete();
+        }
+        foreach($this->skips as $item){
+            $item->delete();
+        }
     }
+    
+    public static function findForTeacherload($teacherloadId = null) {
+        return self::find()->where(['teacherLoadId' => $teacherloadId])->all();
+    }
+    
+    public function getSkips() {
+        return Skip::findForSchedule($this->id);
+    }
+    public function getMarks() {
+        return Mark::findForSchedule($this->id);
+    }
+
 }

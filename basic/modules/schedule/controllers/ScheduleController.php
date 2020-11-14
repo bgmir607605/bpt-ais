@@ -123,7 +123,7 @@ class ScheduleController extends DefaultController
             foreach($availableSchedule as $rec){
                 // Всё равно помечать удалённой. Фильтрация на удалённость лишняя
                 $model = Schedule::findOne($rec->id);
-                $model->markAsDeleted();
+                $model->delete();
             }
         }
 

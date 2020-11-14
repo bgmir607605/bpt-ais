@@ -16,7 +16,7 @@ use Yii;
  * @property Direct $direct
  * @property Teacherload[] $teacherloads
  */
-class Discipline extends \yii\db\ActiveRecord
+class Discipline extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -71,15 +71,13 @@ class Discipline extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Teacherload::className(), ['disciplineId' => 'id']);
     }
-
-    public function markAsDeleted()
-    {
-        $this->deleted = '1';
-        $this->save();
+    
+    protected function deleteDependent() {
         // Привязанные нагрузки
         $teacherloads = Teacherload::find()->where(['disciplineId' => $this->id])->all();
         foreach($teacherloads as $teacherload){
-            $teacherload->markAsDeleted();
+            $teacherload->delete();
         }
     }
+
 }

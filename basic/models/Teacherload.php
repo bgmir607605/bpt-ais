@@ -24,7 +24,7 @@ use Yii;
  * @property Group $group
  * @property User $user
  */
-class Teacherload extends \yii\db\ActiveRecord
+class Teacherload extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -98,21 +98,28 @@ class Teacherload extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'userId']);
     }
-
-    public function markAsDeleted()
-    {
-        $this->deleted = '1';
-        $this->save();
-
-        // Каскадно помечаем удалёнными все привязанные занятия
-        $schedules = Schedule::find()->where(['teacherloadId' => $this->id])->all();
-        foreach($schedules as $schedule){
-            $schedule->markAsDeleted();
-        }
-    }
     
     public function getCountSchedules() {
         $schedules = Schedule::find()->where(['teacherLoadId' => $this->id])->andWhere(['deleted' => '0'])->all();
         return count($schedules);
+    }
+
+    protected function deleteDependent() {
+        foreach($this->schedules as $item){
+            $item->delete();
+        }
+        // TODO monitoring delete too
+    }
+
+    public static function findForGroup($groupId = null) {
+        return self::find()->where(['groupId' => $groupId])->all();
+    }
+    
+    public static function findForUser($userId = null) {
+        return self::find()->where(['userId' => $userId])->all();
+    }
+    
+    public function getSchedules() {
+        return Schedule::findForTeacherload($this->id);
     }
 }

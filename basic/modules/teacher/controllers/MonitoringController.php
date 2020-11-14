@@ -14,8 +14,10 @@ class MonitoringController extends DefaultController {
     {
         $teacher = Yii::$app->user->identity;
         // Свои нагрузки
+        // needRefactoring user->teacherloads
         $teacherloads = Teacherload::find()->select('groupId')->distinct()->where(['userId' => $teacher->id])->all();
         // Замены
+        // needRefactoring user->teacherloadsWhereIamReplacer
         $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]); 
         $replaceTeacherloads = Teacherload::find()->select('groupId')->distinct()->where(['in', 'id', $replaceTeacherloadsIds])->all();
         // возвращаем вид
@@ -27,11 +29,14 @@ class MonitoringController extends DefaultController {
 
     public function actionForGroup($groupId = 0)
     {
+        // needRefactoringGroup::findOneNotDeleted
         $group = Group::findOne($groupId);
         $teacher = Yii::$app->user->identity;
         // Свои нагрузки
+        // needRefactoring user->teacherloads
         $teacherloads = Teacherload::find()->where(['userId' => $teacher->id])->andWhere(['groupId' => $groupId])->all();
         // Замены
+        // needRefactoring user->teacherloadsWhereIamReplacer
         $replaceTeacherloads = array();
         // $replaceTeacherloads = $teacher->teacherloadsWhereIReplace;
         $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]);
@@ -49,9 +54,11 @@ class MonitoringController extends DefaultController {
         $monitoringId = 1;
         $teacher = Yii::$app->user->identity;
         // Найти эту нагрузку
+        // needRefactoring Teacherload::findOneNotDeleted
         $teacherload = Teacherload::find()->where(['id' => $id])->one();
         // TODO Далее всё зависит от отношения пользователя к нагрузке
         // Если пользователь вобще никак не относится - ничего не давать
+        // needRefactoring вынести логику
         $schedules = Schedule::find()->where(['1' => '0']);
         // Если это основная нагрузка пользователя - дать все занятия
         if($teacherload->userId == $teacher->id){
@@ -73,6 +80,7 @@ class MonitoringController extends DefaultController {
         $students = $teacherload->group->students;
         // // Найти оценки по найденным занятиям
         // // TODO переписать
+        // needRefactoring MarkSet, MonitoringMarkSet
         $marks = array();
         $schedulesIds = Schedule::find()->select('id')->where(['teacherloadId' => $id])->orderBy('date');
         $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['deleted' => '0'])->all();
@@ -89,6 +97,7 @@ class MonitoringController extends DefaultController {
     public function actionSave()
     {
         // TODO id мониторинга
+        // needRefactoring
         $monitoringId = 1;
         $teacherloadId = Yii::$app->request->post('teacherloadId');
         $post = Yii::$app->request->post();
