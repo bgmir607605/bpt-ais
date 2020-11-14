@@ -101,6 +101,7 @@ AppAsset::register($this);
                     ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
                     ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
                     ['label' => 'Студенты', 'url' => ['/group-manager/student']],
+                    ['label' => 'Посещаемость', 'url' => ['/group-manager/skip']],
                 ]
             ];
         }
