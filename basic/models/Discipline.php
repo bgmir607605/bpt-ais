@@ -71,20 +71,13 @@ class Discipline extends NotDeletableAR
     {
         return $this->hasMany(Teacherload::className(), ['disciplineId' => 'id']);
     }
-
-    public function markAsDeleted()
-    {
-        $this->deleted = '1';
-        $this->save();
+    
+    protected function deleteDependent() {
         // Привязанные нагрузки
         $teacherloads = Teacherload::find()->where(['disciplineId' => $this->id])->all();
         foreach($teacherloads as $teacherload){
-            $teacherload->markAsDeleted();
+            $teacherload->delete();
         }
-    }
-
-    protected function deleteDependent() {
-        
     }
 
 }

@@ -12,14 +12,14 @@ $this->params['breadcrumbs'][] = ['label' => $this->title];
     <div class="body-content">
     <h1><?= $this->title; ?></h1>
         <?php
-            foreach($teacherloads as $teacherload){
-                echo Html::a($teacherload->group->name, ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId], ['class' => 'profile-link']) .'<br>';
+            foreach($teacher->groupsWhereIamWorking as $group){
+                echo Html::a($group->name, ['/teacher/journal/for-group', 'groupId' => $group->id], ['class' => 'profile-link']) .'<br>';
             }
         ?>
         <hr>
         <?php
-            foreach($replaceTeacherloads as $teacherload){
-                echo Html::a($teacherload->group->name, ['/teacher/journal/for-group', 'groupId' => $teacherload->groupId], ['class' => 'profile-link']) .'<br>';
+            foreach($teacher->GroupsWhereIamReplacer as $group){
+                echo Html::a($group->name, ['/teacher/journal/for-group', 'groupId' => $group->id], ['class' => 'profile-link']) .'<br>';
             }
         ?>
     </div>

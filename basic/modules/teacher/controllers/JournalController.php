@@ -16,19 +16,8 @@ class JournalController extends DefaultController {
      */
     public function actionIndex()
     {
-        $teacher = Yii::$app->user->identity;
-        // Свои нагрузки
-        // needRefactoring user->teacherloads
-        $teacherloads = Teacherload::find()->select('groupId')->distinct()->where(['userId' => $teacher->id])->all();
-        // Замены
-        // $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id]); 
-        // needRefactoring user->teacherloadsWhereIamReplacer
-        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $teacher->id])->andWhere(['deleted' => '0']); 
-        $replaceTeacherloads = Teacherload::find()->select('groupId')->distinct()->where(['in', 'id', $replaceTeacherloadsIds])->all();
-        // возвращаем вид
         return $this->render('index',[
-            'teacherloads' => $teacherloads,
-            'replaceTeacherloads' => $replaceTeacherloads,
+            'teacher' => Yii::$app->user->identity,
         ]);
     }
     public function actionForGroup($groupId = 0)
@@ -48,6 +37,8 @@ class JournalController extends DefaultController {
         $replaceTeacherloads = Teacherload::find()->where(['in', 'id', $replaceTeacherloadsIds])->andWhere(['groupId' => $groupId])->all();
         // возвращаем вид
         return $this->render('forGroup',[
+            
+            'teacher' => $teacher,
             'group' => $group,
             'teacherloads' => $teacherloads,
             'replaceTeacherloads' => $replaceTeacherloads,

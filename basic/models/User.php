@@ -92,22 +92,6 @@ class User extends NotDeletableAR implements \yii\web\IdentityInterface
         return $res;
     }
 
-    public function markAsDeleted()
-    {
-        $this->deleted = '1';
-        $this->save();
-        // Привязанные нагрузки
-        $teacherloads = Teacherload::find()->where(['userId' => $this->id])->all();
-        foreach($teacherloads as $teacherload){
-            $teacherload->markAsDeleted();
-        }
-        // Привязанные занятия
-        $schedules = Schedule::find()->where(['replaceTeacherId' => $this->id])->all();
-        foreach($schedules as $schedule){
-            $schedule->markAsDeleted();
-        }
-    }
-
     public function getInitials()
     {
         return sprintf('%s %s. %s.',
@@ -170,8 +154,42 @@ class User extends NotDeletableAR implements \yii\web\IdentityInterface
         // 
     }
 
+    // needRefactoring
+    //TODO дописать
     protected function deleteDependent() {
         
+    }
+    
+    /**
+     * Для учителя возвращает список групп, в которых есть его основные нагрузки
+     */
+    public function getGroupsWhereIamWorking() {
+        $teacherloads = Teacherload::find()->select('groupId')->distinct()->where(['userId' => $this->id])->all();
+        $groupsIds = \yii\helpers\ArrayHelper::getColumn($teacherloads, 'groupId');
+        return Group::find()->where(['in', 'id', $groupsIds])->orderBy('name')->all();
+    }
+    /**
+     * Для учителя возвращает список групп, в которых он заменяет
+     */
+    public function getGroupsWhereIamReplacer() {
+        $replaceTeacherloadsIds = Schedule::find()->select('teacherLoadId')->distinct()->where(['replaceTeacherId' => $this->id])->andWhere(['deleted' => '0']); 
+        $replaceTeacherloads = Teacherload::find()->select('groupId')->distinct()->where(['in', 'id', $replaceTeacherloadsIds])->all();
+        $groupsIds = \yii\helpers\ArrayHelper::getColumn($replaceTeacherloads, 'groupId');
+        return Group::find()->where(['in', 'id', $groupsIds])->orderBy('name')->all();
+    }
+    
+    public function getTeacherloadsInGroup($groupId) {
+        $res = [];
+        foreach($this->getTeacherloads() as $item){
+            if($item->groupId == $groupId){
+                $res[] = $item;
+            }
+        }
+        return $item;
+    }
+    
+    public function getTeacherloads() {
+        Teacherload::findForUser($this->id);
     }
 
 }
