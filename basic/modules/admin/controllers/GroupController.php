@@ -8,6 +8,7 @@ use app\models\User;
 class GroupController extends DefaultController {
     public function actionIndex()
     {
+        // needRefactoring Group::findAllNotDeleted 
         $groups = Group::find()->where(['deleted' => '0'])->orderBy('name')->all();
         return $this->render('index', ['groups' => $groups]);
     }
@@ -15,6 +16,7 @@ class GroupController extends DefaultController {
     public function actionStudents($groupId = 0)
     {
         $group = Group::findOne($groupId);
+        // needRefactoring Group -> students
         $ids = StudentInGroup::find()->select('userId')->where(['groupId' => $groupId]);
         $students = User::find()->where(['in', 'id', $ids])->andWhere(['deleted' => '0'])->orderBy('lName')->all();
         return $this->render('students', [

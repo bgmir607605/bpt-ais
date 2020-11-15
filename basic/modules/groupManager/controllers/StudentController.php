@@ -10,6 +10,7 @@ class StudentController extends DefaultController {
 
     public function actionIndex()
     {
+        // needRefactoring user->group
         $groupId = GroupManager::find()->where(['userId' => Yii::$app->user->identity->id])->andWhere(['deleted' => '0'])->one()->groupId;
         $group = Group::find()->where(['id' => $groupId])->andWhere(['deleted' => '0'])->one();
         return $this->render('index', [
