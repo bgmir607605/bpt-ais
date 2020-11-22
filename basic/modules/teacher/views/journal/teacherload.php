@@ -230,8 +230,8 @@ $js = <<<JS
                 let idLesson = elem.id.split('s')[0].split('l')[1];
                 // В цикле перебрать каждый символ строки с оценкой
                 for(var i = 0; i < mark.length; i++){
-                    // Если символ 2 3 4 5 - создать отдельную запись
-                    if('2345'.indexOf(mark[i]) !== -1){
+                    // Если символ 0 2 3 4 5 - создать отдельную запись
+                    if('02345'.indexOf(mark[i]) !== -1){
                         let markEnt = {
                             "studentId" : idStudent,
                             "scheduleId" : idLesson,
