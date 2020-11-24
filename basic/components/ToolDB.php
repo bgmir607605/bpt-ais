@@ -3,7 +3,6 @@ namespace app\components;
 
 use yii\base\Component;
 use yii\helpers\FileHelper;
-use app\models\Log;
 use Yii;
 
 class ToolDB extends Component{
@@ -13,9 +12,6 @@ class ToolDB extends Component{
 public function fullBackup() {
     $path = '@app/backups/';
     $fileName = 'dump_' . date('d-m-Y_H-i-s') . '.sql';
-    // $log = new Log();
-    // $log->message = 'Авторизация администратора. Создание резервной копии '. $fileName;
-    // $log->save();
     
     $path = FileHelper::normalizePath(Yii::getAlias($path));
     $filePath = '';
@@ -25,7 +21,7 @@ public function fullBackup() {
             $db = Yii::$app->getDb();
             $db->password = str_replace("(","\(",$db->password);
             exec('echo "-- Version: '.Yii::$app->version.' \n" > ' . $filePath);
-            exec('mysqldump --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' --skip-add-locks >> ' . $filePath);
+            exec('mysqldump --opt --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' --skip-add-locks >> ' . $filePath);
             return $filePath;
         }
     }
@@ -35,42 +31,24 @@ public function fullBackup() {
 public function getContentOfFullBackup() {
     $db = Yii::$app->getDb();
     $db->password = str_replace("(","\(",$db->password);
-    $dump = shell_exec('mysqldump --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' --skip-add-locks');
+    $dump = shell_exec('mysqldump --opt  --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' --skip-add-locks');
     return $dump;
 }
 
 // Создание резервной копии всей БД
 public function tableBackup($tableName = '') {
     $path = '@app/backups/';
-    $fileName = 'dump_'.$tableName.'_' . date('d-m-Y_H-i-s') . '.sql';
-    // $log = new Log();
-    // $log->message = $fileName;
-    // $log->save();
-    
+    $fileName = 'dump_'.$tableName.'_' . date('d-m-Y_H-i-s') . '.sql';    
     $path = FileHelper::normalizePath(Yii::getAlias($path));
     if (file_exists($path)) {
         if (is_dir($path)) {
-            if (!is_writable($path)) {
-                // Yii::$app->session->setFlash('error', 'Дирректория не доступна для записи.');
-                // return Yii::$app->response->redirect(['db/index']);
-            } 
             $filePath = $path . DIRECTORY_SEPARATOR . $fileName;
             $db = Yii::$app->getDb();
-            if (!$db) {
-                // Yii::$app->session->setFlash('error', 'Нет подключения к базе данных.');
-                // return Yii::$app->response->redirect(['db/index']);
-            } 
             //Экранируем скобку которая есть в пароле
             $db->password = str_replace("(","\(",$db->password);
-            exec('mysqldump --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' '.$tableName.' --skip-add-locks > ' . $filePath);
-            // Yii::$app->session->setFlash('success', 'Экспорт успешно завершен. Файл "'.$fileName.'" в папке ' . $path);
-        } else {
-            // Yii::$app->session->setFlash('error', 'Путь должен быть папкой.');
+            exec('mysqldump --opt --host=' . $this->getDsnAttribute('host', $db->dsn) . ' --user=' . $db->username . ' --password=' . $db->password . ' ' . $this->getDsnAttribute('dbname', $db->dsn) . ' '.$tableName.' --skip-add-locks > ' . $filePath);
         }
-    } else {
-        // Yii::$app->session->setFlash('error', 'Указанный путь не существует.');
     }
-    // return Yii::$app->response->redirect(['db/index']);
 }
 
 
