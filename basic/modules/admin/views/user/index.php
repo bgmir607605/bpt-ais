@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
@@ -42,7 +43,19 @@ $this->params['breadcrumbs'][] = $this->title;
             //'student',
             //'deleted',
 
-            ['class' => 'yii\grid\ActionColumn'],
+//            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {login-as} {delete}',
+                'buttons' => [
+                    'login-as' => function ($url,$model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-user" title="Залогиниться"></span>',
+//                            $url);
+                        Url::toRoute(['/admin/user/login-as', 'userId' => $model->id]));
+                    },
+                ],
+            ],
         ],
     ]); ?>
 
