@@ -101,6 +101,24 @@ class Group extends NotDeletableAR
         return $skips;
     }
     
+    /**
+     * 
+     * @param type $year
+     * @param type $month
+     * Пока очень страшный костыль
+     * По хорошему Нужно в построителе запроса указать ид занятий в нужном месяце
+     */
+    public function getSkipsForYearAndMonth($year, $month) {
+        $res = [];
+        foreach($this->skips as $skip){
+            // substr('2020-01-15', 0, 7) -> '2020-01'
+            if(substr($skip->schedule->date, 0, 7) == $year.'-'.$month){
+                $res[] = $skip;
+            }
+        }
+        return $res;
+    }
+    
     public static function findForDirect($directId = null) {
         return self::find()->where(['directId' => $directId])->all();
     }
