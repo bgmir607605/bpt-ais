@@ -91,6 +91,16 @@ class Group extends NotDeletableAR
         return GroupManager::findForGroup($this->id);
     }
     
+    /**
+     * 
+     * @return array of models
+     */
+    function getSkips() {
+        $studentsIds = \yii\helpers\ArrayHelper::getColumn($this->students, 'id');
+        $skips = Skip::find()->where(['in', 'studentId', $studentsIds])->all();
+        return $skips;
+    }
+    
     public static function findForDirect($directId = null) {
         return self::find()->where(['directId' => $directId])->all();
     }
