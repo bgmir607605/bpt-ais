@@ -6,6 +6,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 
 $this->title = 'Посещаемость';
+$skips = $group->skips;
 ?>
 <style>
     th, td {
@@ -20,6 +21,8 @@ $this->title = 'Посещаемость';
   
 
     <div class="body-content">
+        <?= Html::a('Скачать Excel файл', ['/group-manager/skip/excel', 'start' => $start->format('Y-m-d')], ['class' => 'btn btn-info']) ?>
+        <hr>
         <?php
         $url = Url::toRoute(['/group-manager/skip/index']);
             $form = ActiveForm::begin([
