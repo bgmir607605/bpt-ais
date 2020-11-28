@@ -49,4 +49,18 @@ class SkipController extends DefaultController {
         ]);
     }
     
+    public function actionExcel($start = null){
+//        TODO Передавать на вход набор данных
+        // needRefactoring user->group
+        $start = new \DateTime($start);
+        $year = $start->format('Y');
+        $month = $start->format('m');
+        
+        $interval = new \DateInterval('P1D');
+        $recurrences = cal_days_in_month(CAL_GREGORIAN, $month, $year) - 1;
+        $period = new \DatePeriod($start, $interval, $recurrences);
+        $content = Yii::$app->toExcel->getSkipsForInspector($period, $start);
+        Yii::$app->response->sendContentAsFile($content, 'Посещаемость.xlsx');
+    }
+    
 }

@@ -2,7 +2,19 @@
 use yii\helpers\Html;
 
 $this->title = "Оценки";
-?><div class="admin-default-index">
+// По возрастанию:
+function my_cmp_function($a, $b){
+    return ($a['date'] > $b['date']);
+}
+?>
+<style>
+    .my-mark {
+        cursor: pointer;
+        margin-left: 1px;
+        margin-right: 1px;
+    }
+</style>
+<div class="admin-default-index">
     <h1>Дисциплины</h1>
     <table class="table table-hover table-stripped table-bordered">
         <thead>
@@ -17,11 +29,19 @@ $this->title = "Оценки";
                 <?=Html::tag('td', $data['teacherload']->discipline->shortName, [ 'title' => $data['teacherload']->discipline->fullName ])?>
                 <?=Html::tag('td', $data['teacherload']->user->getInitials(), [ 'title' => $data['teacherload']->user->getFullName() ])?>
                 <td><?php
-                    foreach($data['marks'] as $mark) {
-                        echo Html::tag('span', $mark->value, [ 'title' => $mark->schedule->date ]);
+                    
+                    uasort($data['items'], 'my_cmp_function');
+                    
+                    foreach($data['items'] as $item) {
+                        echo Html::tag('span', $item['value'], [ 'title' => $item['date'], 'class' => 'my-mark', 'onClick' => 'hello(\''.$item['date'].'\')' ]);
                     }
                 ?></td>
             </tr><?php } ?>
         </tbody>
     </table>
 </div>
+<script>
+function hello(dateSchedule){
+    alert(dateSchedule);
+}
+</script>
