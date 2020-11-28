@@ -2,7 +2,15 @@
 use yii\helpers\Html;
 
 $this->title = "Оценки";
-?><div class="admin-default-index">
+?>
+<style>
+    .my-mark {
+        cursor: pointer;
+        margin-left: 1px;
+        margin-right: 1px;
+    }
+</style>
+<div class="admin-default-index">
     <h1>Дисциплины</h1>
     <table class="table table-hover table-stripped table-bordered">
         <thead>
@@ -18,7 +26,7 @@ $this->title = "Оценки";
                 <?=Html::tag('td', $data['teacherload']->user->getInitials(), [ 'title' => $data['teacherload']->user->getFullName() ])?>
                 <td><?php
                     foreach($data['marks'] as $mark) {
-                        echo Html::tag('span', $mark->value, [ 'title' => $mark->schedule->date ]);
+                        echo Html::tag('span', $mark->value, [ 'title' => $mark->schedule->date, 'class' => 'my-mark' ]);
                     }
                 ?></td>
             </tr><?php } ?>
