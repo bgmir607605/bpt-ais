@@ -6,6 +6,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 
 $this->title = 'Посещаемость';
+$skips = $group->getSkipsForYearAndMonth($start->format('Y'), $start->format('m'));
 ?>
 <style>
     th, td {

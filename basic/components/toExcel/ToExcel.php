@@ -320,23 +320,52 @@ class ToExcel extends Component{
     
     // Excel посещаемости для группы за месяц для кл руководителя
     public function getSkips($group, $period, $start){
+        $tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
+        $phpexcel = new PHPExcel();
+        $phpexcel = $this->addSkipsPageForGroup($phpexcel, $group, $period, $start);
+        $objWriter = IOFactory::createWriter($phpexcel, 'Excel2007');
+        $objWriter->save($tempFile);
+        $excelOutput = file_get_contents($tempFile);
+        unlink($tempFile);
+        return $excelOutput;
+    }
+    
+    /**
+     * Посещаемость для инспектора
+     */
+    public function getSkipsForInspector($period, $start){
+        
+        $tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
+        $phpexcel = new PHPExcel();
+        // Получаем список групп
+        $groups = Group::find()->orderBy('name')->all();
+        foreach($groups as $group){
+            $phpexcel = $this->addSkipsPageForGroup($phpexcel, $group, $period, $start);
+        }
+        // Пишем файл
+        $objWriter = IOFactory::createWriter($phpexcel, 'Excel2007');
+        $objWriter->save($tempFile);
+        $excelOutput = file_get_contents($tempFile);
+        unlink($tempFile);
+        return $excelOutput;
+    }
+
+
+    public function addSkipsPageForGroup(PHPExcel $phpexcel, $group, $period, $start)
+    {
+        $pageIndex = 0;
         // Индекс столбца итого
         $indexColumnItogo = 0;
         // Индекс столбца ув
         $indexColumnUv = 0;
         // Индекс столбца неув
         $indexColumnNeUv = 0;
-        $this->tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
-        $this->phpexcel = new PHPExcel();
-        $pageIndex = 0;
-        $this->phpexcel->createSheet($pageIndex); //  
-        $page = $this->phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
-        $this->phpexcel->getActiveSheet()->setTitle($group->name);
+        $phpexcel->createSheet($pageIndex);
+        $page = $phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
+        $phpexcel->getActiveSheet()->setTitle($group->name);
         $columnindex = 0;
         $lineIndex = 1;
 
-//            Индекс строки начинается с 1, столбца - с 0
-//            $page->getCellByColumnAndRow(30, 2)->setValue('asd123');
         $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Студент');
         $columnindex++;
         foreach($period as $date){
@@ -354,6 +383,9 @@ class ToExcel extends Component{
         $indexColumnNeUv = $columnindex;
         $columnindex++;
         $lineIndex++;
+        
+        $groupSkips = $group->getSkipsForYearAndMonth($start->format('Y'), $start->format('m'));
+
         foreach($group->students as $student){
             $startColumnIndex = 0;
             $columnindex = $startColumnIndex;
@@ -365,21 +397,22 @@ class ToExcel extends Component{
             // Печатаем по дням
             foreach($period as $date){
                 $skipsOnDate = 0;
-                foreach ($group->skips as $skip){
+                foreach ($groupSkips as $skip){
                     if($skip->studentId == $student->id && $skip->schedule->date == $date->format('Y-m-d')){
                         $skipsOnDate += $skip->schedule->hours;
                     }
                 }
                 $sumForMonth += $skipsOnDate;
-                $cellValue = $skipsOnDate > 0 ? $skipsOnDate : '';
-                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+                if($skipsOnDate > 0){
+                    $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($skipsOnDate.'');
+                }
                 $columnindex++;
             }
             // Итого по студенту
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($sumForMonth);
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($sumForMonth.'');
             $columnindex++;
             // Уважительно по студенту
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue(0);
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('0');
             $columnindex++;
             // Не уважительно по студенту (формула)
             // Координаты ячейкт "Итого"
@@ -388,7 +421,7 @@ class ToExcel extends Component{
             $sCell = $page->getCellByColumnAndRow($columnindex -1, $lineIndex)->getCoordinate();
             // Пишем формулу вычитания уважительных из итого
             $cellValue = "=$fCell-$sCell";
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue.'');
             $columnindex++;
             $lineIndex++;
         }
@@ -398,134 +431,18 @@ class ToExcel extends Component{
         $fCell = $page->getCellByColumnAndRow($indexColumnItogo, 2)->getCoordinate();
         $sCell = $page->getCellByColumnAndRow($indexColumnItogo, $lineIndex -1)->getCoordinate();
         $cellValue = "=SUM($fCell:$sCell)";
-        $page->getCellByColumnAndRow($indexColumnItogo, $lineIndex)->setValue($cellValue);
+        $page->getCellByColumnAndRow($indexColumnItogo, $lineIndex)->setValue($cellValue.'');
         // Ув
         $fCell = $page->getCellByColumnAndRow($indexColumnUv, 2)->getCoordinate();
         $sCell = $page->getCellByColumnAndRow($indexColumnUv, $lineIndex -1)->getCoordinate();
         $cellValue = "=SUM($fCell:$sCell)";
-        $page->getCellByColumnAndRow($indexColumnUv, $lineIndex)->setValue($cellValue);
+        $page->getCellByColumnAndRow($indexColumnUv, $lineIndex)->setValue($cellValue.'');
         // Не ув
         $fCell = $page->getCellByColumnAndRow($indexColumnNeUv, 2)->getCoordinate();
         $sCell = $page->getCellByColumnAndRow($indexColumnNeUv, $lineIndex -1)->getCoordinate();
         $cellValue = "=SUM($fCell:$sCell)";
-        $page->getCellByColumnAndRow($indexColumnNeUv, $lineIndex)->setValue($cellValue);
-        
-
-        $objWriter = IOFactory::createWriter($this->phpexcel, 'Excel2007');
-        $objWriter->save($this->tempFile);
-        $excelOutput = file_get_contents($this->tempFile);
-        unlink($this->tempFile);
-        return $excelOutput;
-    }
-    
-    /**
-     * Посещаемость для инспектора
-     */
-    public function getSkipsForInspector($period, $start){
-        
-        $this->tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
-        $this->phpexcel = new PHPExcel();
-        $pageIndex = 0;
-        // Получаем список групп
-        $groups = Group::find()->orderBy('name')->all();
-        foreach($groups as $group){
-            // Индекс столбца итого
-            $indexColumnItogo = 0;
-            // Индекс столбца ув
-            $indexColumnUv = 0;
-            // Индекс столбца неув
-            $indexColumnNeUv = 0;
-            $this->phpexcel->createSheet($pageIndex); //  
-            $page = $this->phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
-            $this->phpexcel->getActiveSheet()->setTitle($group->name);
-            $columnindex = 0;
-            $lineIndex = 1;
-
-    //            Индекс строки начинается с 1, столбца - с 0
-    //            $page->getCellByColumnAndRow(30, 2)->setValue('asd123');
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Студент');
-            $columnindex++;
-            foreach($period as $date){
-                $cellValue =  $date->format('d');
-                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
-                $columnindex++;
-            }
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Итого');
-            $indexColumnItogo = $columnindex;
-            $columnindex++;
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Ув.');
-            $indexColumnUv = $columnindex;
-            $columnindex++;
-            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Не ув.');
-            $indexColumnNeUv = $columnindex;
-            $columnindex++;
-            $lineIndex++;
-            // пропуске по всей группе тольео за указанный месяц
-            $groupSkips = $group->getSkipsForYearAndMonth($start->format('Y'), $start->format('m'));
-            foreach($group->students as $student){
-                $startColumnIndex = 0;
-                $columnindex = $startColumnIndex;
-                $cellValue = $student->lName.' '.$student->fName;
-                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
-                $columnindex++;
-                // Итого по студенту
-                $sumForMonth = 0;
-                // Печатаем по дням
-                foreach($period as $date){
-                    $skipsOnDate = 0;
-                    foreach ($groupSkips as $skip){
-                        if($skip->studentId == $student->id && $skip->schedule->date == $date->format('Y-m-d')){
-                            $skipsOnDate += $skip->schedule->hours;
-                        }
-                    }
-                    $sumForMonth += $skipsOnDate;
-                    $cellValue = $skipsOnDate > 0 ? $skipsOnDate : '';
-                    $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
-                    $columnindex++;
-                }
-                // Итого по студенту
-                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($sumForMonth);
-                $columnindex++;
-                // Уважительно по студенту
-                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue(0);
-                $columnindex++;
-                // Не уважительно по студенту (формула)
-                // Координаты ячейкт "Итого"
-                $fCell = $page->getCellByColumnAndRow($columnindex -2, $lineIndex)->getCoordinate();
-                // Координаты ячейкт "Уважительно"
-                $sCell = $page->getCellByColumnAndRow($columnindex -1, $lineIndex)->getCoordinate();
-                // Пишем формулу вычитания уважительных из итого
-                $cellValue = "=$fCell-$sCell";
-                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
-                $columnindex++;
-                $lineIndex++;
-            }
-            // Последняя строка с суммами
-            $page->getCellByColumnAndRow(0, $lineIndex)->setValue('Итого');
-            // Итого
-            $fCell = $page->getCellByColumnAndRow($indexColumnItogo, 2)->getCoordinate();
-            $sCell = $page->getCellByColumnAndRow($indexColumnItogo, $lineIndex -1)->getCoordinate();
-            $cellValue = "=SUM($fCell:$sCell)";
-            $page->getCellByColumnAndRow($indexColumnItogo, $lineIndex)->setValue($cellValue);
-            // Ув
-            $fCell = $page->getCellByColumnAndRow($indexColumnUv, 2)->getCoordinate();
-            $sCell = $page->getCellByColumnAndRow($indexColumnUv, $lineIndex -1)->getCoordinate();
-            $cellValue = "=SUM($fCell:$sCell)";
-            $page->getCellByColumnAndRow($indexColumnUv, $lineIndex)->setValue($cellValue);
-            // Не ув
-            $fCell = $page->getCellByColumnAndRow($indexColumnNeUv, 2)->getCoordinate();
-            $sCell = $page->getCellByColumnAndRow($indexColumnNeUv, $lineIndex -1)->getCoordinate();
-            $cellValue = "=SUM($fCell:$sCell)";
-            $page->getCellByColumnAndRow($indexColumnNeUv, $lineIndex)->setValue($cellValue);
-        }
-        
-        
-        // Пишем файл
-        $objWriter = IOFactory::createWriter($this->phpexcel, 'Excel2007');
-        $objWriter->save($this->tempFile);
-        $excelOutput = file_get_contents($this->tempFile);
-        unlink($this->tempFile);
-        return $excelOutput;
+        $page->getCellByColumnAndRow($indexColumnNeUv, $lineIndex)->setValue($cellValue.'');
+        return $phpexcel;
     }
     
 }
