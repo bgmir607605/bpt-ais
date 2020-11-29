@@ -4,6 +4,7 @@ namespace app\modules\admin\controllers;
 
 use Yii;
 use app\models\User;
+use app\models\Log;
 use app\models\UserSearch;
 use yii\web\NotFoundHttpException;
 
@@ -87,5 +88,17 @@ class UserController extends DefaultController
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    
+    public function actionLoginAs($userId) {
+        $user = User::findOne($userId);
+        Yii::$app->user->login($user);
+        $log = new Log();
+        $log->ip = $_SERVER['REMOTE_ADDR'];
+        $log->action = $this->route;
+        $log->optional = 'admin login-as';
+        $log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
+        $log->save();
+        return $this->redirect(['/']);
     }
 }

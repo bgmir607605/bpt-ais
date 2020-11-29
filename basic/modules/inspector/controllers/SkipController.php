@@ -20,8 +20,6 @@ class SkipController extends DefaultController {
         $group = Group::findOne($groupId);
         $group = empty($group) ? $groups[0] : $group;
         $studentsIds = \yii\helpers\ArrayHelper::getColumn($group->students, 'id');
-        $skips = \app\models\Skip::find()->where(['in', 'studentId', $studentsIds])->all();
-        
         $interval = new \DateInterval('P1D');
         $recurrences = cal_days_in_month(CAL_GREGORIAN, $month, $year) - 1;
         $period = new \DatePeriod($start, $interval, $recurrences);
@@ -42,11 +40,24 @@ class SkipController extends DefaultController {
         return $this->render('index', [
             'group' => $group,
             'groups' => $groups,
-            'skips' => $skips,
             'months' => $months,
             'period' => $period,
             'start' => $start,
         ]);
+    }
+    
+    public function actionExcel($start = null){
+//        TODO Передавать на вход набор данных
+        // needRefactoring user->group
+        $start = new \DateTime($start);
+        $year = $start->format('Y');
+        $month = $start->format('m');
+        
+        $interval = new \DateInterval('P1D');
+        $recurrences = cal_days_in_month(CAL_GREGORIAN, $month, $year) - 1;
+        $period = new \DatePeriod($start, $interval, $recurrences);
+        $content = Yii::$app->toExcel->getSkipsForInspector($period, $start);
+        Yii::$app->response->sendContentAsFile($content, 'Посещаемость.xlsx');
     }
     
 }
