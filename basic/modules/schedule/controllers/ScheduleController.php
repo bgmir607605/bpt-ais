@@ -128,10 +128,14 @@ class ScheduleController extends DefaultController
         }
 
 
+        // Оповещалки
+        Yii::$app->Notifier->vk($curDate);
         return $this->asJson([
             'received' => $processed,
             'errors' => $errors
         ]);
+        
+        
     }
 
     public function actionGetdata($needDate = NULL){
