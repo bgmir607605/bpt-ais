@@ -11,7 +11,7 @@ class Notifier extends Component{
     public function vk($date) {
         // Захардкодил 5ИС
         $group = Group::findOne(14);
-        $chatId = 6;
+        $chatId = 5;
         $schedules = Schedule::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($group->Teacherloads, 'id')])->andWhere(['date' => $date])->orderBy('number')->all();
             
         // Вынести в конфиги
