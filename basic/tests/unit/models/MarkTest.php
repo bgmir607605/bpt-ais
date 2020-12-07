@@ -15,30 +15,30 @@ class MarkTest extends \Codeception\Test\Unit
         expect($mark->value)->equals('3');
 
         // Поиск существующего. deleted = 1
-        expect_not(Mark::findOne(2));
+        expect_not(Mark::findOne(19055));
         // Поиск не существующего.
         expect_not(Mark::findOne(5));
     }
     
     public function testFindOneDeleted()
     {
-        expect_that(Mark::findOneDeleted(2));
+        expect_that(Mark::findOneDeleted(19055));
         expect_not(Mark::findOneDeleted(3));
-        expect_not(Mark::findOneDeleted(15));
+        expect_not(Mark::findOneDeleted(5));
     }
     public function testFindAll()
     {
-        $this->assertCount(16212, Mark::findAll());
+        $this->assertCount(36494, Mark::findAll());
     }
     
     public function testFindAllDeleted()
     {
-        $this->assertCount(3, Mark::findAllDeleted());
+        $this->assertCount(31, Mark::findAllDeleted());
     }
     
     public function testFindForSchedule() {
         $marks = Mark::findForSchedule(2174);
-        $this->assertCount(17, $marks);
+        $this->assertCount(18, $marks);
         $this->assertEquals('3', $marks[0]->value);
     }
     
@@ -46,12 +46,12 @@ class MarkTest extends \Codeception\Test\Unit
     
     public function testDelete()
     {
-        $this->assertCount(16212, Mark::findAll());
-        $this->assertCount(3, Mark::findAllDeleted());
+        $this->assertCount(36494, Mark::findAll());
+        $this->assertCount(31, Mark::findAllDeleted());
         $mark = Mark::findOne(3);
         $mark->delete();
-        $this->assertCount(16211, Mark::findAll());
-        $this->assertCount(4, Mark::findAllDeleted());
+        $this->assertCount(36493, Mark::findAll());
+        $this->assertCount(32, Mark::findAllDeleted());
         
         
     }

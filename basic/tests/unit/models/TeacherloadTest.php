@@ -28,12 +28,12 @@ class TeacherloadTest extends \Codeception\Test\Unit
     }
     public function testFindAll()
     {
-        $this->assertCount(622, Teacherload::findAll());
+        $this->assertCount(621, Teacherload::findAll());
     }
     
     public function testFindAllDeleted()
     {
-        $this->assertCount(10, Teacherload::findAllDeleted());
+        $this->assertCount(11, Teacherload::findAllDeleted());
     }
     
     public function testFindForGroup() {
@@ -53,14 +53,14 @@ class TeacherloadTest extends \Codeception\Test\Unit
     {
         // TODO monitoring delete too
         $teacherload = Teacherload::findOne(509);
-        $this->assertCount(622, Teacherload::findAll());
-        $this->assertCount(10, Teacherload::findAllDeleted());
-        $this->assertCount(37, $teacherload->schedules);
+        $this->assertCount(621, Teacherload::findAll());
+        $this->assertCount(11, Teacherload::findAllDeleted());
+        $this->assertCount(56, $teacherload->schedules);
         
         $teacherload->delete();
         
-        $this->assertCount(621, Teacherload::findAll());
-        $this->assertCount(11, Teacherload::findAllDeleted());
+        $this->assertCount(620, Teacherload::findAll());
+        $this->assertCount(12, Teacherload::findAllDeleted());
         $this->assertCount(0, $teacherload->schedules);
         
         
