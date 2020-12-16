@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "attestation".
@@ -79,6 +80,43 @@ class Attestation extends NotDeletableAR
         foreach($this->teacherloadInAttestations as $item){
             $item->delete();
         }
+    }
+    
+    public function getName() {
+        $disciplineName = '';
+        $teachersNames = '';
+        foreach($this->teacherloadInAttestations as $item){
+            $disciplineName = $item->teacherload->discipline->fullName;
+            $teachersNames .= $item->teacherload->user->initials. ' ';
+        }
+        
+        return $disciplineName. ' ('.$teachersNames.')';
+    }
+    
+    public function getGroup() {
+        return $this->teacherloadInAttestations[0]->teacherload->group;
+    }
+    
+    public static function findForGroup($groupId) {
+        $group = Group::findOne($groupId);
+        $teacherloadsIds = ArrayHelper::getColumn($group->teacherloads, 'id');
+        $attestationsIds = ArrayHelper::getColumn(TeacherloadInAttestation::find()->where(['in', 'teacherloadId', $teacherloadsIds])->all(), 'attestationId');
+        return Attestation::find()->where(['in', 'id', $attestationsIds])->all();
+    }
+    
+    
+    public function addTeacherload($teacherloadId) {
+        $teacherload = Teacherload::findOne($teacherloadId);
+        if(!empty($teacherload)){
+            $model = new TeacherloadInAttestation();
+            $model->teacherloadId = $teacherload->id;
+            $model->attestationId = $this->id;
+            if($model->save()){
+                return true;
+            }
+        }
+        return false;
+        
     }
 
 }

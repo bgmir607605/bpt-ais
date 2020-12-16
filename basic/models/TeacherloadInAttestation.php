@@ -73,5 +73,9 @@ class TeacherloadInAttestation extends NotDeletableAR
     protected function deleteDependent() {
         
     }
+    
+    public function getName() {
+        return $this->teacherload->discipline->fullName.' ('. $this->teacherload->user->initials.')';
+    }
 
 }
