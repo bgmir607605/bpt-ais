@@ -16,7 +16,7 @@ use Yii;
  * @property Attestation $attestation
  * @property User $student
  */
-class AttestationMark extends \yii\db\ActiveRecord
+class AttestationMark extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -71,4 +71,9 @@ class AttestationMark extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'studentId']);
     }
+
+    protected function deleteDependent() {
+        
+    }
+
 }

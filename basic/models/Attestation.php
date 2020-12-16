@@ -16,7 +16,7 @@ use Yii;
  * @property AttestationMark[] $attestationMarks
  * @property TeacherloadInAttestation[] $teacherloadInAttestations
  */
-class Attestation extends \yii\db\ActiveRecord
+class Attestation extends NotDeletableAR
 {
     /**
      * {@inheritdoc}
@@ -71,4 +71,14 @@ class Attestation extends \yii\db\ActiveRecord
     {
         return $this->hasMany(TeacherloadInAttestation::className(), ['attestationId' => 'id']);
     }
+
+    protected function deleteDependent() {
+        foreach($this->attestationMarks as $item){
+            $item->delete();
+        }
+        foreach($this->teacherloadInAttestations as $item){
+            $item->delete();
+        }
+    }
+
 }
