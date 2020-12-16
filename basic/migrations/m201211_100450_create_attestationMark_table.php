@@ -5,45 +5,45 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%semestrMark}}`.
  */
-class m201211_100450_create_semestrMark_table extends Migration
+class m201211_100450_create_attestationMark_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%semestrMark}}', [
+        $this->createTable('{{%attestationMark}}', [
             'id' => $this->primaryKey(),
-            'semestrId' => $this->integer(),
+            'attestationId' => $this->integer(),
             'studentId' => $this->integer(),
             'value' => $this->integer().' DEFAULT NULL',
             'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
         
         $this->createIndex(
-            'idx-semestrMark-semestrId',
-            'semestrMark',
-            'semestrId'
+            'idx-attestationMark-attestationId',
+            'attestationMark',
+            'attestationId'
         );
 
         $this->addForeignKey(
-            'fk-semestrMark-semestrId',
-            'semestrMark',
-            'semestrId',
-            'semestr',
+            'fk-attestationMark-attestationId',
+            'attestationMark',
+            'attestationId',
+            'attestation',
             'id',
             'CASCADE'
         );
 
         $this->createIndex(
-            'idx-semestrMark-studentId',
-            'semestrMark',
+            'idx-attestationMark-studentId',
+            'attestationMark',
             'studentId'
         );
 
         $this->addForeignKey(
-            'fk-semestrMark-studentId',
-            'semestrMark',
+            'fk-attestationMark-studentId',
+            'attestationMark',
             'studentId',
             'user',
             'id',
@@ -56,6 +56,6 @@ class m201211_100450_create_semestrMark_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%semestrMark}}');
+        $this->dropTable('{{%attestationMark}}');
     }
 }

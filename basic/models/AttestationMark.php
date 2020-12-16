@@ -5,25 +5,25 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "semestrMark".
+ * This is the model class for table "attestationMark".
  *
  * @property int $id
- * @property int|null $semestrId
+ * @property int|null $attestationId
  * @property int|null $studentId
  * @property int|null $value
  * @property int $deleted
  *
- * @property Semestr $semestr
+ * @property Attestation $attestation
  * @property User $student
  */
-class SemestrMark extends \yii\db\ActiveRecord
+class AttestationMark extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'semestrMark';
+        return 'attestationMark';
     }
 
     /**
@@ -32,8 +32,8 @@ class SemestrMark extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['semestrId', 'studentId', 'value', 'deleted'], 'integer'],
-            [['semestrId'], 'exist', 'skipOnError' => true, 'targetClass' => Semestr::className(), 'targetAttribute' => ['semestrId' => 'id']],
+            [['attestationId', 'studentId', 'value', 'deleted'], 'integer'],
+            [['attestationId'], 'exist', 'skipOnError' => true, 'targetClass' => Attestation::className(), 'targetAttribute' => ['attestationId' => 'id']],
             [['studentId'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['studentId' => 'id']],
         ];
     }
@@ -45,7 +45,7 @@ class SemestrMark extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'semestrId' => 'Semestr ID',
+            'attestationId' => 'Attestation ID',
             'studentId' => 'Student ID',
             'value' => 'Value',
             'deleted' => 'Deleted',
@@ -53,13 +53,13 @@ class SemestrMark extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Semestr]].
+     * Gets query for [[Attestation]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSemestr()
+    public function getAttestation()
     {
-        return $this->hasOne(Semestr::className(), ['id' => 'semestrId']);
+        return $this->hasOne(Attestation::className(), ['id' => 'attestationId']);
     }
 
     /**

@@ -5,42 +5,42 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%teacherloadInSemestr}}`.
  */
-class m201211_095921_create_teacherloadInSemestr_table extends Migration
+class m201211_095921_create_teacherloadInAttestation_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%teacherloadInSemestr}}', [
+        $this->createTable('{{%teacherloadInAttestation}}', [
             'id' => $this->primaryKey(),
-            'semestrId' => $this->integer(),
+            'attestationId' => $this->integer(),
             'teacherloadId' => $this->integer(),
             'deleted' => $this->integer().' NOT NULL DEFAULT 0',
         ]);
         
         $this->createIndex(
-            'idx-teacherloadInSemestr-semestrId',
-            'teacherloadInSemestr',
-            'semestrId'
+            'idx-teacherloadInAttestation-attestationId',
+            'teacherloadInAttestation',
+            'attestationId'
         );
         $this->createIndex(
-            'idx-teacherloadInSemestr-teacherloadId',
-            'teacherloadInSemestr',
+            'idx-teacherloadInAttestation-teacherloadId',
+            'teacherloadInAttestation',
             'teacherloadId'
         );
 
         $this->addForeignKey(
-            'fk-teacherloadInSemestr-semestrId',
-            'teacherloadInSemestr',
-            'semestrId',
-            'semestr',
+            'fk-teacherloadInAttestation-attestationId',
+            'teacherloadInAttestation',
+            'attestationId',
+            'attestation',
             'id',
             'CASCADE'
         );
         $this->addForeignKey(
-            'fk-teacherloadInSemestr-teacherloadId',
-            'teacherloadInSemestr',
+            'fk-teacherloadInAttestation-teacherloadId',
+            'teacherloadInAttestation',
             'teacherloadId',
             'teacherload',
             'id',
@@ -53,6 +53,6 @@ class m201211_095921_create_teacherloadInSemestr_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%teacherloadInSemestr}}');
+        $this->dropTable('{{%teacherloadInAttestation}}');
     }
 }

@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "semestr".
+ * This is the model class for table "attestation".
  *
  * @property int $id
  * @property string|null $date
@@ -13,17 +13,17 @@ use Yii;
  * @property int|null $semestrNumber
  * @property int $deleted
  *
- * @property SemestrMark[] $semestrMarks
- * @property TeacherloadInSemestr[] $teacherloadInSemestrs
+ * @property AttestationMark[] $attestationMarks
+ * @property TeacherloadInAttestation[] $teacherloadInAttestations
  */
-class Semestr extends \yii\db\ActiveRecord
+class Attestation extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'semestr';
+        return 'attestation';
     }
 
     /**
@@ -53,22 +53,22 @@ class Semestr extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[SemestrMarks]].
+     * Gets query for [[AttestationMarks]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSemestrMarks()
+    public function getAttestationMarks()
     {
-        return $this->hasMany(SemestrMark::className(), ['semestrId' => 'id']);
+        return $this->hasMany(AttestationMark::className(), ['attestationId' => 'id']);
     }
 
     /**
-     * Gets query for [[TeacherloadInSemestrs]].
+     * Gets query for [[TeacherloadInAttestations]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTeacherloadInSemestrs()
+    public function getTeacherloadInAttestations()
     {
-        return $this->hasMany(TeacherloadInSemestr::className(), ['semestrId' => 'id']);
+        return $this->hasMany(TeacherloadInAttestation::className(), ['attestationId' => 'id']);
     }
 }

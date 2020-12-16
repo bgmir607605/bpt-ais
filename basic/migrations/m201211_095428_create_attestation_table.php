@@ -5,14 +5,14 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%semestr}}`.
  */
-class m201211_095428_create_semestr_table extends Migration
+class m201211_095428_create_attestation_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%semestr}}', [
+        $this->createTable('{{%attestation}}', [
             'id' => $this->primaryKey(),
             'date' => $this->date(),
             'type' => "SET('ДКР', 'Экзамен', 'Квалификационный экзамен', 'Дифференцированный зачёт')",
@@ -26,6 +26,6 @@ class m201211_095428_create_semestr_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%semestr}}');
+        $this->dropTable('{{%attestation}}');
     }
 }
