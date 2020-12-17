@@ -85,12 +85,14 @@ class Attestation extends NotDeletableAR
     public function getName() {
         $disciplineName = '';
         $teachersNames = '';
+        $groupName = '';
         foreach($this->teacherloadInAttestations as $item){
             $disciplineName = $item->teacherload->discipline->fullName;
             $teachersNames .= $item->teacherload->user->initials. ' ';
+            $groupName = $item->teacherload->group->name;
         }
         
-        return $disciplineName. ' ('.$teachersNames.')';
+        return $groupName. ' '.$disciplineName. ' ('.$teachersNames.') '.$this->type;
     }
     
     public function getGroup() {
@@ -119,4 +121,42 @@ class Attestation extends NotDeletableAR
         
     }
 
+    public static function getArrayOfSemestersNumbers() {
+        return self::find()->select('semestrNumber')->distinct()->column();
+    }
+    
+    public static function findForTeacherInSemestr($teacherId, $semestrNumber) {
+        $teacher = User::findOne($teacherId);
+        $teacherloadsIds = ArrayHelper::getColumn($teacher->teacherloads, 'id');
+        $attestationsIds = ArrayHelper::getColumn(TeacherloadInAttestation::find()->where(['in', 'teacherloadId', $teacherloadsIds])->all(), 'attestationId');
+        return Attestation::find()->where(['in', 'id', $attestationsIds])->andWhere(['semestrNumber' => $semestrNumber])->all();
+    }
+    
+    /**
+     * Проверяет: имеет ли доступ к редактированию (оценок) этой аттестации этот пользователь
+     * @param type $userId
+     */
+    public function hasAccessForThisTeacher($userId) {
+        $result = false;
+        foreach ($this->teacherloadInAttestations as $item){
+            if($item->teacherload->userId == $userId){
+                $result = true;
+                break;
+            }
+        }
+        return $result;
+    }
+    
+    public function saveMarkForStudent($mark, $studentId) {
+        $model = AttestationMark::find()->where(['attestationId' => $this->id])->andWhere(['studentId' => $studentId])->one();
+        // не понятно что я тут сочинил но выглядит не очень
+        if(!empty($model)){
+            $model->delete();
+        }
+        $model = new AttestationMark();
+        $model->studentId = $studentId;
+        $model->attestationId = $this->id;
+        $model->value = $mark;
+        $model->save();
+    }
 }
