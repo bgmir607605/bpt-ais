@@ -92,6 +92,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
                     ['label' => 'Мониторинг', 'url' => ['/inspector/monitoring']],
+                    ['label' => 'Семестровые', 'url' => ['/inspector/attestation']],
                     ['label' => 'Посещаемость', 'url' => ['/inspector/skip']],
                 ]
             ];

@@ -500,4 +500,20 @@ class ToExcel extends Component{
         return $phpexcel;
     }
     
+    public function getAttestations() {
+        $tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
+        $phpexcel = new PHPExcel();
+        // Получаем список групп
+        $groups = Group::find()->orderBy('name')->all();
+        foreach($groups as $group){
+            $phpexcel = $this->addAttestationsPageForGroup($phpexcel, $group);
+        }
+        // Пишем файл
+        $objWriter = IOFactory::createWriter($phpexcel, 'Excel2007');
+        $objWriter->save($tempFile);
+        $excelOutput = file_get_contents($tempFile);
+        unlink($tempFile);
+        return $excelOutput;
+    }
+    
 }
