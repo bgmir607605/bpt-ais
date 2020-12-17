@@ -46,9 +46,10 @@ class Attestation extends NotDeletableAR
     {
         return [
             'id' => 'ID',
-            'date' => 'Date',
-            'type' => 'Type',
-            'semestrNumber' => 'Semestr Number',
+            'date' => 'Дата',
+            'type' => 'Тип',
+            'semestrNumber' => 'Семестр',
+            'name' => 'Название',
             'deleted' => 'Deleted',
         ];
     }
@@ -158,5 +159,9 @@ class Attestation extends NotDeletableAR
         $model->attestationId = $this->id;
         $model->value = $mark;
         $model->save();
+    }
+    
+    public function getValueOfMarkForStudent($studentId) {
+        return AttestationMark::find()->where(['attestationId' => $this->id])->andWhere(['studentId' => $studentId])->one()->value ?? '';
     }
 }

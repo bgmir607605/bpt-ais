@@ -102,13 +102,13 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
                     ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
+                    ['label' => 'Семестровые', 'url' => ['/group-manager/attestation']],
                     ['label' => 'Студенты', 'url' => ['/group-manager/student']],
                     ['label' => 'Посещаемость', 'url' => ['/group-manager/skip']],
                 ]
             ];
         }
         // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
-        // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
         $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
         $itemsMenu[] = (
             '<li>'
