@@ -13,6 +13,19 @@ use yii\web\NotFoundHttpException;
  */
 class UserController extends DefaultController
 {
+    
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => \yii\filters\VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                    'reset-password' => ['POST'],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Lists all User models.
@@ -100,5 +113,12 @@ class UserController extends DefaultController
         $log->userId = Yii::$app->user->identity->id.': '.Yii::$app->user->identity->username;
         $log->save();
         return $this->redirect(['/']);
+    }
+    
+    public function actionResetPassword() {
+        $model = User::findOne(Yii::$app->request->get('id'));
+        $model->resetPassword();
+        Yii::$app->session->setFlash('success', 'Пароль сброшен');
+        return $this->redirect(Yii::$app->request->referrer);
     }
 }

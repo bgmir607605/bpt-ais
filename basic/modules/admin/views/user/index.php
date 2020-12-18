@@ -46,13 +46,23 @@ $this->params['breadcrumbs'][] = $this->title;
 //            ['class' => 'yii\grid\ActionColumn'],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {login-as} {delete}',
+                'template' => '{view} {update} {login-as} {reset-password} {delete}',
                 'buttons' => [
                     'login-as' => function ($url,$model) {
                         return Html::a(
                             '<span class="glyphicon glyphicon-user" title="Залогиниться"></span>',
 //                            $url);
                         Url::toRoute(['/admin/user/login-as', 'userId' => $model->id]));
+                    },
+                    'reset-password' => function ($url, $data) {
+                        return Html::a('<span class="glyphicon glyphicon-erase" title="Сбросить пароль"></span>', ['/admin/user/reset-password', 'id' => $data->id], 
+                                [
+                                    'title' => Yii::t('yii', 'Сбросить пароль'),
+                                    'aria-label' => Yii::t('yii', 'Сбросить пароль'),
+                                    'data-confirm' => Yii::t('yii', 'Сбросить пароль для этого пользователя?'),
+                                    'data-method' => 'post',
+                                    'data-pjax' => '0',
+                                ]);
                     },
                 ],
             ],
