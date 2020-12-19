@@ -28,30 +28,30 @@ class SkipTest extends \Codeception\Test\Unit
     }
     public function testFindAll()
     {
-        $this->assertCount(4231, Skip::findAll());
+        $this->assertCount(14747, Skip::findAll());
     }
     
     public function testFindAllDeleted()
     {
-        $this->assertCount(2, Skip::findAllDeleted());
+        $this->assertCount(88, Skip::findAllDeleted());
     }
     
     public function testFindForSchedule() {
-        $skips = Skip::findForSchedule(2174);
+        $skips = Skip::findForSchedule(2802);
         $this->assertCount(4, $skips);
-        $this->assertEquals('177', $skips[0]->studentId);
+        $this->assertEquals('508', $skips[0]->studentId);
     }
     
     
     
     public function testDelete()
     {
-        $this->assertCount(4231, Skip::findAll());
-        $this->assertCount(2, Skip::findAllDeleted());
-        $skip = Skip::findOne(13);
+        $this->assertCount(14747, Skip::findAll());
+        $this->assertCount(88, Skip::findAllDeleted());
+        $skip = Skip::findOne(480);
         $skip->delete();
-        $this->assertCount(4230, Skip::findAll());
-        $this->assertCount(3, Skip::findAllDeleted());
+        $this->assertCount(14746, Skip::findAll());
+        $this->assertCount(89, Skip::findAllDeleted());
         
         
     }

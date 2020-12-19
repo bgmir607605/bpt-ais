@@ -59,6 +59,7 @@ AppAsset::register($this);
                     ['label' => 'Журналы', 'url' => ['/teacher/journal']],
                     ['label' => 'Расписание', 'url' => ['/teacher/schedule']],
                     ['label' => 'Мониторинг', 'url' => ['/teacher/monitoring']],
+                    ['label' => 'Семестровые', 'url' => ['/teacher/attestation']],
                     ['label' => 'Нагрузки', 'url' => ['/teacher/teacherload']],
                 ]
                 ];
@@ -70,6 +71,7 @@ AppAsset::register($this);
                     ['label' => 'Оценки', 'url' => ['/student/mark']],
                     ['label' => 'Пропуски', 'url' => ['/student/skip']],
                     ['label' => 'Мониторинг', 'url' => ['/student/monitoring']],
+                    ['label' => 'Семестровые', 'url' => ['/student/attestation']],
                 ]
                 ];
         }
@@ -91,6 +93,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/inspector/journal/group-on-date']],
                     ['label' => 'Мониторинг', 'url' => ['/inspector/monitoring']],
+                    ['label' => 'Семестровые', 'url' => ['/inspector/attestation']],
                     ['label' => 'Посещаемость', 'url' => ['/inspector/skip']],
                 ]
             ];
@@ -100,14 +103,15 @@ AppAsset::register($this);
                 'label' => 'Кл. рук.', 
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                    ['label' => 'Журнал', 'url' => ['/group-manager/journal']],
                     ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
+                    ['label' => 'Семестровые', 'url' => ['/group-manager/attestation']],
                     ['label' => 'Студенты', 'url' => ['/group-manager/student']],
                     ['label' => 'Посещаемость', 'url' => ['/group-manager/skip']],
                 ]
             ];
         }
         // $itemsMenu[] = ['label' => 'Приёмная ком.', 'url' => ['/applicant-manager']];
-        // $itemsMenu[] = ['label' => 'Кл.рук', 'url' => ['/group-manager']];
         $itemsMenu[] = ['label' => '<span class="glyphicon glyphicon-cog" title="Настройки"></span>', 'encode' => false, 'url' => ['/user/index']];
         $itemsMenu[] = (
             '<li>'

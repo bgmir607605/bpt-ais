@@ -122,4 +122,8 @@ class Group extends NotDeletableAR
     public static function findForDirect($directId = null) {
         return self::find()->where(['directId' => $directId])->all();
     }
+    
+    public function getAttestations() {
+        return Attestation::findForGroup($this->id);
+    }
 }
