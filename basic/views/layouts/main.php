@@ -103,6 +103,7 @@ AppAsset::register($this);
                 'label' => 'Кл. рук.', 
                 'items' => [
                     ['label' => 'Дн. оценки', 'url' => ['/group-manager/journal/group-on-date']],
+                    ['label' => 'Журнал', 'url' => ['/group-manager/journal']],
                     ['label' => 'Мониторинг', 'url' => ['/group-manager/monitoring']],
                     ['label' => 'Семестровые', 'url' => ['/group-manager/attestation']],
                     ['label' => 'Студенты', 'url' => ['/group-manager/student']],

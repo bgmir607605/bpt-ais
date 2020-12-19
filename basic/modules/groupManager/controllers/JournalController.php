@@ -24,8 +24,8 @@ class JournalController extends DefaultController {
         // Находим запрашиваемую группу
         // TODO При необходимости вешать на одного препода несколько групп будем ковырять здесь
         // needRefactoring user->group
-        $groupId = GroupManager::find()->where(['userId' => Yii::$app->user->identity->id])->andWhere(['deleted' => '0'])->one()->groupId;
-        $group = Group::find()->where(['id' => $groupId])->andWhere(['deleted' => '0'])->one();
+        $groupId = GroupManager::find()->where(['userId' => Yii::$app->user->identity->id])->one()->groupId;
+        $group = Group::findOne($groupId);
         // Если и группа и дата есть - ищем студентов, занятия, оценки и пропуски
         if(!empty($date) && !empty($group)){
             // Студенты
@@ -33,14 +33,14 @@ class JournalController extends DefaultController {
             $studentsIds = ArrayHelper::getColumn($students, 'id');
             // Занятия
             // needRefactoring новый класс ScheduleSet
-            $schedules = Schedule::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($group->Teacherloads, 'id')])->andWhere(['date' => $date])->andWhere(['deleted' => '0'])->orderBy('number')->all();
+            $schedules = Schedule::find()->where(['in', 'teacherLoadId', ArrayHelper::getColumn($group->Teacherloads, 'id')])->andWhere(['date' => $date])->orderBy('number')->all();
             $schedulesIds = ArrayHelper::getColumn($schedules, 'id');
             // Оценки
             // needRefactoring новый класс MarkSet
-            $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['in', 'studentId', $studentsIds])->andWhere(['deleted' => '0'])->all();
+            $marks = Mark::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['in', 'studentId', $studentsIds])->all();
             // Пропуски
             // needRefactoring новый класс SkipSet
-            $skips = Skip::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['in', 'studentId', $studentsIds])->andWhere(['deleted' => '0'])->all();
+            $skips = Skip::find()->where(['in', 'scheduleId', $schedulesIds])->andWhere(['in', 'studentId', $studentsIds])->all();
         }
         return $this->render('groupOnDate', [
             'date' => $date,
@@ -50,6 +50,27 @@ class JournalController extends DefaultController {
             'marks' => $marks,
             'skips' => $skips,
 
+        ]);
+    }
+    
+    public function actionIndex() {
+        // Получить список нагрузок по группе
+        $groupId = GroupManager::find()->where(['userId' => Yii::$app->user->identity->id])->one()->groupId;
+        $group = Group::findOne($groupId);
+        return $this->render('index', [
+            'group' => $group,
+        ]);
+        
+    }
+    
+    public function actionTeacherload($id = null)
+    {
+        $teacherload = Teacherload::findOne($id);
+        $schedules = Schedule::find()->where(['teacherLoadId' => $teacherload->id])->orderBy('date')->all();
+
+        return $this->render('teacherload', [
+            'teacherload' => $teacherload,
+            'schedules' => $schedules,
         ]);
     }
 
