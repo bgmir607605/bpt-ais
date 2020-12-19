@@ -1,2 +1,2 @@
 <?php
-return '2020.12.19';
+return 'DEVELOPMENT 2020.12.19';
