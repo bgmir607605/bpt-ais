@@ -189,7 +189,13 @@ class User extends NotDeletableAR implements \yii\web\IdentityInterface
     }
     
     public function getTeacherloads() {
-        Teacherload::findForUser($this->id);
+        return Teacherload::findForUser($this->id);
+    }
+    
+    public function resetPassword() {
+        $this->password = Yii::$app->getSecurity()->generatePasswordHash('0000', 10);
+        $this->save();
+        
     }
 
 }

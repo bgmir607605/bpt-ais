@@ -42,13 +42,19 @@ $this->params['breadcrumbs'][] = $this->title;
             // ['class' => 'yii\grid\ActionColumn'],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {report} {delete}',
+                'template' => '{view} {update} {report} {attestation} {delete}',
                 'buttons' => [
                     'report' => function ($url,$model) {
                         return Html::a(
                             '<span class="glyphicon glyphicon-list" title="Нагрузки"></span>',
 //                            $url);
                         Url::toRoute(['teacherload/list-for-group', 'groupId' => $model->id]));
+                    },
+                    'attestation' => function ($url,$model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-flag" title="Аттестация"></span>',
+//                            $url);
+                        Url::toRoute(['/schedule/attestation/for-group', 'groupId' => $model->id]));
                     },
                 ],
             ],

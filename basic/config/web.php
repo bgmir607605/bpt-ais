@@ -87,6 +87,9 @@ $config = [
         'ToolDB' => [
             'class' => 'app\components\ToolDB',
         ],
+        'Notifier' => [
+            'class' => 'app\components\Notifier',
+        ],
     ],
     'params' => $params,
 ];

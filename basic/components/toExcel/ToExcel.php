@@ -445,4 +445,75 @@ class ToExcel extends Component{
         return $phpexcel;
     }
     
+    // Excel семестровых для группы
+    public function getAttestationsForGroup($group){
+        $tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
+        $phpexcel = new PHPExcel();
+        $phpexcel = $this->addAttestationsPageForGroup($phpexcel, $group);
+        $objWriter = IOFactory::createWriter($phpexcel, 'Excel2007');
+        $objWriter->save($tempFile);
+        $excelOutput = file_get_contents($tempFile);
+        unlink($tempFile);
+        return $excelOutput;
+    }
+    
+    public function addAttestationsPageForGroup(PHPExcel $phpexcel, Group $group)
+    {
+        $pageIndex = 0;
+        $phpexcel->createSheet($pageIndex);
+        $page = $phpexcel->setActiveSheetIndex($pageIndex); // Делаем активной 
+        $phpexcel->getActiveSheet()->setTitle($group->name);
+        $columnindex = 0;
+        $lineIndex = 1;
+
+        $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Семестр');
+        $lineIndex++;
+        $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue('Студент');
+        $lineIndex--;
+        $columnindex++;
+        foreach($group->attestations as $attestation){
+            $cellValue =  (String) $attestation->semestrNumber;
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+            $lineIndex++;
+            $cellValue =  $attestation->name;
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+            $lineIndex--;
+            $columnindex++;
+        }
+        $lineIndex++;
+        $lineIndex++;
+        
+
+        foreach($group->students as $student){
+            $startColumnIndex = 0;
+            $columnindex = $startColumnIndex;
+            $cellValue = $student->lName.' '.$student->fName;
+            $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+            $columnindex++;
+            foreach($group->attestations as $attestation){
+                $cellValue = (String)$attestation->getValueOfMarkForStudent($student->id);
+                $page->getCellByColumnAndRow($columnindex, $lineIndex)->setValue($cellValue);
+                $columnindex++;
+            }
+            $lineIndex++;
+        }
+        return $phpexcel;
+    }
+    
+    public function getAttestations() {
+        $tempFile = \Yii::getAlias('@app') .'/components/toExcel/'.$this->date.'.xlsx'; 
+        $phpexcel = new PHPExcel();
+        // Получаем список групп
+        $groups = Group::find()->orderBy('name')->all();
+        foreach($groups as $group){
+            $phpexcel = $this->addAttestationsPageForGroup($phpexcel, $group);
+        }
+        // Пишем файл
+        $objWriter = IOFactory::createWriter($phpexcel, 'Excel2007');
+        $objWriter->save($tempFile);
+        $excelOutput = file_get_contents($tempFile);
+        unlink($tempFile);
+        return $excelOutput;
+    }
+    
 }
